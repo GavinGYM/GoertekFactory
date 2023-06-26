@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.EquipmentMapper">
+    
+    <resultMap type="Equipment" id="EquipmentResult">
+        <result property="equipmentId"    column="equipment_id"    />
+        <result property="equipmentName"    column="equipment_name"    />
+        <result property="equipmentBrand"    column="equipment_brand"    />
+        <result property="equipmentModel"    column="equipment_model"    />
+        <result property="equipmentType"    column="equipment_type"    />
+        <result property="equipmentCode"    column="equipment_code"    />
+        <result property="equipmentRunningStatus"    column="equipment_running_status"    />
+        <result property="equipmentActiveStatus"    column="equipment_active_status"    />
+        <result property="equipmentAddTime"    column="equipment_add_time"    />
+    </resultMap>
+
+    <sql id="selectEquipmentVo">
+        select equipment_id, equipment_name, equipment_brand, equipment_model, equipment_type, equipment_code, equipment_running_status, equipment_active_status, equipment_add_time from mes_equipment
+    </sql>
+
+    <select id="selectEquipmentList" parameterType="Equipment" resultMap="EquipmentResult">
+        <include refid="selectEquipmentVo"/>
+        <where>  
+            <if test="equipmentName != null  and equipmentName != ''"> and equipment_name like concat('%', #{equipmentName}, '%')</if>
+            <if test="equipmentBrand != null  and equipmentBrand != ''"> and equipment_brand = #{equipmentBrand}</if>
+            <if test="equipmentType != null  and equipmentType != ''"> and equipment_type = #{equipmentType}</if>
+            <if test="equipmentRunningStatus != null "> and equipment_running_status = #{equipmentRunningStatus}</if>
+            <if test="equipmentActiveStatus != null "> and equipment_active_status = #{equipmentActiveStatus}</if>
+            <if test="equipmentAddTime != null "> and equipment_add_time = #{equipmentAddTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectEquipmentByEquipmentId" parameterType="Long" resultMap="EquipmentResult">
+        <include refid="selectEquipmentVo"/>
+        where equipment_id = #{equipmentId}
+    </select>
+        
+    <insert id="insertEquipment" parameterType="Equipment" useGeneratedKeys="true" keyProperty="equipmentId">
+        insert into mes_equipment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="equipmentName != null">equipment_name,</if>
+            <if test="equipmentBrand != null">equipment_brand,</if>
+            <if test="equipmentModel != null">equipment_model,</if>
+            <if test="equipmentType != null">equipment_type,</if>
+            <if test="equipmentCode != null">equipment_code,</if>
+            <if test="equipmentRunningStatus != null">equipment_running_status,</if>
+            <if test="equipmentActiveStatus != null">equipment_active_status,</if>
+            <if test="equipmentAddTime != null">equipment_add_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="equipmentName != null">#{equipmentName},</if>
+            <if test="equipmentBrand != null">#{equipmentBrand},</if>
+            <if test="equipmentModel != null">#{equipmentModel},</if>
+            <if test="equipmentType != null">#{equipmentType},</if>
+            <if test="equipmentCode != null">#{equipmentCode},</if>
+            <if test="equipmentRunningStatus != null">#{equipmentRunningStatus},</if>
+            <if test="equipmentActiveStatus != null">#{equipmentActiveStatus},</if>
+            <if test="equipmentAddTime != null">#{equipmentAddTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEquipment" parameterType="Equipment">
+        update mes_equipment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="equipmentName != null">equipment_name = #{equipmentName},</if>
+            <if test="equipmentBrand != null">equipment_brand = #{equipmentBrand},</if>
+            <if test="equipmentModel != null">equipment_model = #{equipmentModel},</if>
+            <if test="equipmentType != null">equipment_type = #{equipmentType},</if>
+            <if test="equipmentCode != null">equipment_code = #{equipmentCode},</if>
+            <if test="equipmentRunningStatus != null">equipment_running_status = #{equipmentRunningStatus},</if>
+            <if test="equipmentActiveStatus != null">equipment_active_status = #{equipmentActiveStatus},</if>
+            <if test="equipmentAddTime != null">equipment_add_time = #{equipmentAddTime},</if>
+        </trim>
+        where equipment_id = #{equipmentId}
+    </update>
+
+    <delete id="deleteEquipmentByEquipmentId" parameterType="Long">
+        delete from mes_equipment where equipment_id = #{equipmentId}
+    </delete>
+
+    <delete id="deleteEquipmentByEquipmentIds" parameterType="String">
+        delete from mes_equipment where equipment_id in 
+        <foreach item="equipmentId" collection="array" open="(" separator="," close=")">
+            #{equipmentId}
+        </foreach>
+    </delete>
+</mapper>
