@@ -40,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertEquipment" parameterType="Equipment" useGeneratedKeys="true" keyProperty="equipmentId">
         insert into mes_equipment
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="equipmentName != null">equipment_name,</if>
+            <if test="equipmentName != null and equipmentName != ''">equipment_name,</if>
             <if test="equipmentBrand != null">equipment_brand,</if>
             <if test="equipmentModel != null">equipment_model,</if>
             <if test="equipmentType != null">equipment_type,</if>
@@ -50,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="equipmentAddTime != null">equipment_add_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="equipmentName != null">#{equipmentName},</if>
+            <if test="equipmentName != null and equipmentName != ''">#{equipmentName},</if>
             <if test="equipmentBrand != null">#{equipmentBrand},</if>
             <if test="equipmentModel != null">#{equipmentModel},</if>
             <if test="equipmentType != null">#{equipmentType},</if>
@@ -64,7 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateEquipment" parameterType="Equipment">
         update mes_equipment
         <trim prefix="SET" suffixOverrides=",">
-            <if test="equipmentName != null">equipment_name = #{equipmentName},</if>
+            <if test="equipmentName != null and equipmentName != ''">equipment_name = #{equipmentName},</if>
             <if test="equipmentBrand != null">equipment_brand = #{equipmentBrand},</if>
             <if test="equipmentModel != null">equipment_model = #{equipmentModel},</if>
             <if test="equipmentType != null">equipment_type = #{equipmentType},</if>

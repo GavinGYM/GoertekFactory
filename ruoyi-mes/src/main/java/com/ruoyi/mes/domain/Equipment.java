@@ -49,8 +49,8 @@ public class Equipment extends BaseEntity
     private Long equipmentActiveStatus;
 
     /** 添加时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "添加时间", width = 30, dateFormat = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "添加时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date equipmentAddTime;
 
     public void setEquipmentId(Long equipmentId) 

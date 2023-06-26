@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.WorkshopMapper">
+    
+    <resultMap type="Workshop" id="WorkshopResult">
+        <result property="workshopId"    column="workshop_id"    />
+        <result property="workshopName"    column="workshop_name"    />
+        <result property="workshopLeader"    column="workshop_leader"    />
+        <result property="workshopStatus"    column="workshop_status"    />
+        <result property="workshopAddTime"    column="workshop_add_time"    />
+        <result property="workshopComment"    column="workshop_comment"    />
+    </resultMap>
+
+    <sql id="selectWorkshopVo">
+        select workshop_id, workshop_name, workshop_leader, workshop_status, workshop_add_time, workshop_comment from mes_workshop
+    </sql>
+
+    <select id="selectWorkshopList" parameterType="Workshop" resultMap="WorkshopResult">
+        <include refid="selectWorkshopVo"/>
+        <where>  
+            <if test="workshopName != null  and workshopName != ''"> and workshop_name like concat('%', #{workshopName}, '%')</if>
+            <if test="workshopLeader != null  and workshopLeader != ''"> and workshop_leader = #{workshopLeader}</if>
+            <if test="workshopStatus != null "> and workshop_status = #{workshopStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectWorkshopByWorkshopId" parameterType="Long" resultMap="WorkshopResult">
+        <include refid="selectWorkshopVo"/>
+        where workshop_id = #{workshopId}
+    </select>
+        
+    <insert id="insertWorkshop" parameterType="Workshop" useGeneratedKeys="true" keyProperty="workshopId">
+        insert into mes_workshop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="workshopName != null and workshopName != ''">workshop_name,</if>
+            <if test="workshopLeader != null">workshop_leader,</if>
+            <if test="workshopStatus != null">workshop_status,</if>
+            <if test="workshopAddTime != null">workshop_add_time,</if>
+            <if test="workshopComment != null">workshop_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="workshopName != null and workshopName != ''">#{workshopName},</if>
+            <if test="workshopLeader != null">#{workshopLeader},</if>
+            <if test="workshopStatus != null">#{workshopStatus},</if>
+            <if test="workshopAddTime != null">#{workshopAddTime},</if>
+            <if test="workshopComment != null">#{workshopComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWorkshop" parameterType="Workshop">
+        update mes_workshop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workshopName != null and workshopName != ''">workshop_name = #{workshopName},</if>
+            <if test="workshopLeader != null">workshop_leader = #{workshopLeader},</if>
+            <if test="workshopStatus != null">workshop_status = #{workshopStatus},</if>
+            <if test="workshopAddTime != null">workshop_add_time = #{workshopAddTime},</if>
+            <if test="workshopComment != null">workshop_comment = #{workshopComment},</if>
+        </trim>
+        where workshop_id = #{workshopId}
+    </update>
+
+    <delete id="deleteWorkshopByWorkshopId" parameterType="Long">
+        delete from mes_workshop where workshop_id = #{workshopId}
+    </delete>
+
+    <delete id="deleteWorkshopByWorkshopIds" parameterType="String">
+        delete from mes_workshop where workshop_id in 
+        <foreach item="workshopId" collection="array" open="(" separator="," close=")">
+            #{workshopId}
+        </foreach>
+    </delete>
+</mapper>

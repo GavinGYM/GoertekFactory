@@ -131,7 +131,7 @@
       </el-table-column>
       <el-table-column label="添加时间" align="center" prop="equipmentAddTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.equipmentAddTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.equipmentAddTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -205,14 +205,6 @@
             >{{dict.label}}</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="添加时间" prop="equipmentAddTime">
-          <el-date-picker clearable
-            v-model="form.equipmentAddTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="请选择添加时间">
-          </el-date-picker>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -263,6 +255,15 @@ export default {
       form: {},
       // 表单校验
       rules: {
+        equipmentName: [
+          { required: true, message: "设备名称不能为空", trigger: "blur" }
+        ],
+        equipmentRunningStatus: [
+          { required: true, message: "设备状态不能为空", trigger: "change" }
+        ],
+        equipmentActiveStatus: [
+          { required: true, message: "启用状态不能为空", trigger: "change" }
+        ],
       }
     };
   },
