@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.RouteMapper">
+
+    <resultMap type="Route" id="RouteResult">
+        <result property="routeId"    column="route_id"    />
+        <result property="routeName"    column="route_name"    />
+        <result property="routeComment"    column="route_comment"    />
+        <result property="routeStatus"    column="route_status"    />
+        <result property="routeAddTime"    column="route_add_time"    />
+    </resultMap>
+
+    <resultMap id="RouteRouteProcessResult" type="Route" extends="RouteResult">
+        <collection property="routeProcessList" notNullColumn="sub_route_id" javaType="java.util.List" resultMap="RouteProcessResult" />
+    </resultMap>
+
+    <resultMap type="RouteProcess" id="RouteProcessResult">
+        <result property="routeId"    column="sub_route_id"    />
+        <result property="processId"    column="sub_process_id"    />
+        <result property="processIndex"    column="sub_process_index"    />
+    </resultMap>
+
+    <sql id="selectRouteVo">
+        select route_id, route_name, route_comment, route_status, route_add_time from mes_route
+    </sql>
+
+    <select id="selectRouteList" parameterType="Route" resultMap="RouteResult">
+        <include refid="selectRouteVo"/>
+        <where>
+            <if test="routeName != null  and routeName != ''"> and route_name like concat('%', #{routeName}, '%')</if>
+            <if test="routeStatus != null "> and route_status = #{routeStatus}</if>
+            <if test="routeAddTime != null "> and route_add_time = #{routeAddTime}</if>
+        </where>
+    </select>
+
+    <select id="selectRouteByRouteId" parameterType="Long" resultMap="RouteRouteProcessResult">
+        select a.route_id, a.route_name, a.route_comment, a.route_status, a.route_add_time,
+               b.route_id as sub_route_id, b.process_id as sub_process_id, b.process_index as sub_process_index
+        from mes_route a
+                 left join mes_route_process b on b.route_id = a.route_id
+        where a.route_id = #{routeId}
+    </select>
+    <!-- 这里增加了 useGeneratedKeys="true" keyProperty="routeId" 两个属性，用于获取数据库的自增主键 -->
+    <insert id="insertRoute" parameterType="Route" useGeneratedKeys="true" keyProperty="routeId">
+        insert into mes_route
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="routeId != null">route_id,</if>
+            <if test="routeName != null and routeName != ''">route_name,</if>
+            <if test="routeComment != null">route_comment,</if>
+            <if test="routeStatus != null">route_status,</if>
+            <if test="routeAddTime != null">route_add_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="routeId != null">#{routeId},</if>
+            <if test="routeName != null and routeName != ''">#{routeName},</if>
+            <if test="routeComment != null">#{routeComment},</if>
+            <if test="routeStatus != null">#{routeStatus},</if>
+            <if test="routeAddTime != null">#{routeAddTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateRoute" parameterType="Route">
+        update mes_route
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="routeName != null and routeName != ''">route_name = #{routeName},</if>
+            <if test="routeComment != null">route_comment = #{routeComment},</if>
+            <if test="routeStatus != null">route_status = #{routeStatus},</if>
+            <if test="routeAddTime != null">route_add_time = #{routeAddTime},</if>
+        </trim>
+        where route_id = #{routeId}
+    </update>
+
+    <delete id="deleteRouteByRouteId" parameterType="Long">
+        delete from mes_route where route_id = #{routeId}
+    </delete>
+
+    <delete id="deleteRouteByRouteIds" parameterType="String">
+        delete from mes_route where route_id in
+        <foreach item="routeId" collection="array" open="(" separator="," close=")">
+            #{routeId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRouteProcessByRouteIds" parameterType="String">
+        delete from mes_route_process where route_id in
+        <foreach item="routeId" collection="array" open="(" separator="," close=")">
+            #{routeId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteRouteProcessByRouteId" parameterType="Long">
+        delete from mes_route_process where route_id = #{routeId}
+    </delete>
+
+    <insert id="batchRouteProcess">
+        insert into mes_route_process( route_id, process_id, process_index) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.routeId}, #{item.processId}, #{item.processIndex})
+        </foreach>
+    </insert>
+</mapper>

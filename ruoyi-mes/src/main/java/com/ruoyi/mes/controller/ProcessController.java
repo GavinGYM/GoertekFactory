@@ -2,8 +2,12 @@ package com.ruoyi.mes.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,6 +31,8 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * @author Yiming Guo
  * @date 2023-06-26
  */
+@Api("查询工序设置列表")
+@Controller
 @RestController
 @RequestMapping("/mes/process")
 public class ProcessController extends BaseController
@@ -37,6 +43,7 @@ public class ProcessController extends BaseController
     /**
      * 查询工序设置列表
      */
+    @ApiOperation("查询工序设置列表")
     @PreAuthorize("@ss.hasPermi('mes:process:list')")
     @GetMapping("/list")
     public TableDataInfo list(Process process)
