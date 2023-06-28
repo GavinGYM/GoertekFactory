@@ -151,7 +151,7 @@
         </el-row>
         <el-table :data="routeProcessList" :row-class-name="rowRouteProcessIndex" @selection-change="handleRouteProcessSelectionChange" ref="routeProcess">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="排序" align="center" prop="index" width="auto"/>
+          <el-table-column label="排序" align="center" prop="index" width="50"/>
           <el-table-column label="工序" align="center" prop="processId" width="auto">
             <template slot-scope="scope">
               <el-select v-model="scope.row.processId" placeholder="请选择工序">
@@ -162,6 +162,12 @@
                   :value="item.processId"
                 ></el-option>
               </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" align="center" prop="operation" width="100">
+            <template slot-scope="scope">
+              <el-button :key="'up-' + scope.$index" circle icon="el-icon-arrow-up" @click="moveUp(scope.$index)" v-if="scope.$index > 0"></el-button>
+              <el-button :key="'down-' + scope.$index" circle icon="el-icon-arrow-down" @click="moveDown(scope.$index)" v-if="scope.$index < routeProcessList.length - 1"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -231,6 +237,18 @@ export default {
     this.getProcessList();
   },
   methods: {
+    /** 上移项目 */
+    moveUp(index) {
+      const item = this.routeProcessList[index];
+      this.routeProcessList.splice(index, 1);
+      this.routeProcessList.splice(index - 1, 0, item);
+    },
+    /** 下移项目 */
+    moveDown(index) {
+      const item = this.routeProcessList[index];
+      this.routeProcessList.splice(index, 1);
+      this.routeProcessList.splice(index + 1, 0, item);
+    },
     /** 查询工序列表 */
     getProcessList() {
       listProcess({}).then(response => {
