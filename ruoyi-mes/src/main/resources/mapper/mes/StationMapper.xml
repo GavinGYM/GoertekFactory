@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.StationMapper">
+    
+    <resultMap type="Station" id="StationResult">
+        <result property="stationId"    column="station_id"    />
+        <result property="stationName"    column="station_name"    />
+        <result property="workshopId"    column="workshop_id"    />
+        <result property="processId"    column="process_id"    />
+        <result property="equipmentId"    column="equipment_id"    />
+        <result property="stationStatus"    column="station_status"    />
+        <result property="stationComment"    column="station_comment"    />
+    </resultMap>
+
+    <sql id="selectStationVo">
+        select station_id, station_name, workshop_id, process_id, equipment_id, station_status, station_comment from mes_station
+    </sql>
+
+    <select id="selectStationList" parameterType="Station" resultMap="StationResult">
+        <include refid="selectStationVo"/>
+        <where>  
+            <if test="stationId != null "> and station_id = #{stationId}</if>
+            <if test="stationName != null  and stationName != ''"> and station_name like concat('%', #{stationName}, '%')</if>
+            <if test="workshopId != null "> and workshop_id = #{workshopId}</if>
+            <if test="processId != null "> and process_id = #{processId}</if>
+            <if test="equipmentId != null "> and equipment_id = #{equipmentId}</if>
+            <if test="stationStatus != null "> and station_status = #{stationStatus}</if>
+            <if test="stationComment != null  and stationComment != ''"> and station_comment = #{stationComment}</if>
+        </where>
+    </select>
+    
+    <select id="selectStationByStationId" parameterType="Long" resultMap="StationResult">
+        <include refid="selectStationVo"/>
+        where station_id = #{stationId}
+    </select>
+        
+    <insert id="insertStation" parameterType="Station">
+        insert into mes_station
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stationId != null">station_id,</if>
+            <if test="stationName != null and stationName != ''">station_name,</if>
+            <if test="workshopId != null">workshop_id,</if>
+            <if test="processId != null">process_id,</if>
+            <if test="equipmentId != null">equipment_id,</if>
+            <if test="stationStatus != null">station_status,</if>
+            <if test="stationComment != null">station_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stationId != null">#{stationId},</if>
+            <if test="stationName != null and stationName != ''">#{stationName},</if>
+            <if test="workshopId != null">#{workshopId},</if>
+            <if test="processId != null">#{processId},</if>
+            <if test="equipmentId != null">#{equipmentId},</if>
+            <if test="stationStatus != null">#{stationStatus},</if>
+            <if test="stationComment != null">#{stationComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStation" parameterType="Station">
+        update mes_station
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stationName != null and stationName != ''">station_name = #{stationName},</if>
+            <if test="workshopId != null">workshop_id = #{workshopId},</if>
+            <if test="processId != null">process_id = #{processId},</if>
+            <if test="equipmentId != null">equipment_id = #{equipmentId},</if>
+            <if test="stationStatus != null">station_status = #{stationStatus},</if>
+            <if test="stationComment != null">station_comment = #{stationComment},</if>
+        </trim>
+        where station_id = #{stationId}
+    </update>
+
+    <delete id="deleteStationByStationId" parameterType="Long">
+        delete from mes_station where station_id = #{stationId}
+    </delete>
+
+    <delete id="deleteStationByStationIds" parameterType="String">
+        delete from mes_station where station_id in 
+        <foreach item="stationId" collection="array" open="(" separator="," close=")">
+            #{stationId}
+        </foreach>
+    </delete>
+</mapper>
