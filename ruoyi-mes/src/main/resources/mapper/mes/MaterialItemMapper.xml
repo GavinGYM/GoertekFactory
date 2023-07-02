@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.MaterialItemMapper">
+    
+    <resultMap type="MaterialItem" id="MaterialItemResult">
+        <result property="materialItemId"    column="material_item_id"    />
+        <result property="materialItemName"    column="material_item_name"    />
+        <result property="materialItemModel"    column="material_item_model"    />
+        <result property="materialItemUnit"    column="material_item_unit"    />
+        <result property="materialItemClass"    column="material_item_class"    />
+        <result property="materialItemType"    column="material_item_type"    />
+        <result property="materialItemRoute"    column="material_item_route"    />
+        <result property="materialItemStatus"    column="material_item_status"    />
+        <result property="materialItemAddTime"    column="material_item_add_time"    />
+        <result property="materialItemComment"    column="material_item_comment"    />
+    </resultMap>
+
+    <sql id="selectMaterialItemVo">
+        select material_item_id, material_item_name, material_item_model, material_item_unit, material_item_class, material_item_type, material_item_route, material_item_status, material_item_add_time, material_item_comment from mes_material_item
+    </sql>
+
+    <select id="selectMaterialItemList" parameterType="MaterialItem" resultMap="MaterialItemResult">
+        <include refid="selectMaterialItemVo"/>
+        <where>  
+            <if test="materialItemName != null  and materialItemName != ''"> and material_item_name like concat('%', #{materialItemName}, '%')</if>
+            <if test="materialItemModel != null  and materialItemModel != ''"> and material_item_model = #{materialItemModel}</if>
+            <if test="materialItemUnit != null "> and material_item_unit = #{materialItemUnit}</if>
+            <if test="materialItemClass != null "> and material_item_class = #{materialItemClass}</if>
+            <if test="materialItemType != null "> and material_item_type = #{materialItemType}</if>
+            <if test="materialItemRoute != null "> and material_item_route = #{materialItemRoute}</if>
+            <if test="materialItemStatus != null "> and material_item_status = #{materialItemStatus}</if>
+            <if test="materialItemAddTime != null "> and material_item_add_time = #{materialItemAddTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectMaterialItemByMaterialItemId" parameterType="Long" resultMap="MaterialItemResult">
+        <include refid="selectMaterialItemVo"/>
+        where material_item_id = #{materialItemId}
+    </select>
+        
+    <insert id="insertMaterialItem" parameterType="MaterialItem">
+        insert into mes_material_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="materialItemId != null">material_item_id,</if>
+            <if test="materialItemName != null">material_item_name,</if>
+            <if test="materialItemModel != null">material_item_model,</if>
+            <if test="materialItemUnit != null">material_item_unit,</if>
+            <if test="materialItemClass != null">material_item_class,</if>
+            <if test="materialItemType != null">material_item_type,</if>
+            <if test="materialItemRoute != null">material_item_route,</if>
+            <if test="materialItemStatus != null">material_item_status,</if>
+            <if test="materialItemAddTime != null">material_item_add_time,</if>
+            <if test="materialItemComment != null">material_item_comment,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="materialItemId != null">#{materialItemId},</if>
+            <if test="materialItemName != null">#{materialItemName},</if>
+            <if test="materialItemModel != null">#{materialItemModel},</if>
+            <if test="materialItemUnit != null">#{materialItemUnit},</if>
+            <if test="materialItemClass != null">#{materialItemClass},</if>
+            <if test="materialItemType != null">#{materialItemType},</if>
+            <if test="materialItemRoute != null">#{materialItemRoute},</if>
+            <if test="materialItemStatus != null">#{materialItemStatus},</if>
+            <if test="materialItemAddTime != null">#{materialItemAddTime},</if>
+            <if test="materialItemComment != null">#{materialItemComment},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMaterialItem" parameterType="MaterialItem">
+        update mes_material_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="materialItemName != null">material_item_name = #{materialItemName},</if>
+            <if test="materialItemModel != null">material_item_model = #{materialItemModel},</if>
+            <if test="materialItemUnit != null">material_item_unit = #{materialItemUnit},</if>
+            <if test="materialItemClass != null">material_item_class = #{materialItemClass},</if>
+            <if test="materialItemType != null">material_item_type = #{materialItemType},</if>
+            <if test="materialItemRoute != null">material_item_route = #{materialItemRoute},</if>
+            <if test="materialItemStatus != null">material_item_status = #{materialItemStatus},</if>
+            <if test="materialItemAddTime != null">material_item_add_time = #{materialItemAddTime},</if>
+            <if test="materialItemComment != null">material_item_comment = #{materialItemComment},</if>
+        </trim>
+        where material_item_id = #{materialItemId}
+    </update>
+
+    <delete id="deleteMaterialItemByMaterialItemId" parameterType="Long">
+        delete from mes_material_item where material_item_id = #{materialItemId}
+    </delete>
+
+    <delete id="deleteMaterialItemByMaterialItemIds" parameterType="String">
+        delete from mes_material_item where material_item_id in 
+        <foreach item="materialItemId" collection="array" open="(" separator="," close=")">
+            #{materialItemId}
+        </foreach>
+    </delete>
+</mapper>

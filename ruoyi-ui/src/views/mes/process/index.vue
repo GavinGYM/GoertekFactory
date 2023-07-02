@@ -91,7 +91,7 @@
       </el-table-column>
       <el-table-column label="添加时间" align="center" prop="processAddTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.processAddTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.processAddTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
