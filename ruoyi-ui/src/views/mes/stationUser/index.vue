@@ -1,23 +1,39 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="工位ID" prop="stationId">
-        <el-input
+      <el-form-item label="工位" prop="stationId">
+        <!-- <el-input
           v-model="queryParams.stationId"
           placeholder="请输入工位ID"
           clearable
           @keyup.enter.native="handleQuery"
-        />
+        /> -->
+        <el-select v-model="queryParams.stationId" placeholder="请选择工位" clearable @change="handleQuery" @keyup.enter.native="handleQuery">
+          <el-option
+            v-for="item in stationList"
+            :key="item.stationList"
+            :label="item.stationName"
+            :value="item.stationId"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="用户ID" prop="userId">
-        <el-input
+      <el-form-item label="人员" prop="userId">
+        <!-- <el-input
           v-model="queryParams.userId"
           placeholder="请输入用户ID"
           clearable
           @keyup.enter.native="handleQuery"
-        />
+        /> -->
+        <el-select v-model="queryParams.userId" placeholder="请选择用户" clearable @change="handleQuery" @keyup.enter.native="handleQuery">
+          <el-option
+            v-for="item in userList"
+            :key="item.userId"
+            :label="item.nickName"
+            :value="item.userId"
+          />
+        </el-select>
       </el-form-item>
-      <el-form-item label="添加人" prop="addUserId">
+      <!-- <el-form-item label="添加人" prop="addUserId">
         <el-input
           v-model="queryParams.addUserId"
           placeholder="请输入添加人"
@@ -32,7 +48,7 @@
           value-format="yyyy-MM-dd"
           placeholder="请选择添加时间">
         </el-date-picker>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
@@ -87,13 +103,15 @@
 
     <el-table v-loading="loading" :data="stationUserList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="工位绑定编号" align="center" prop="stationUserId" />
-      <el-table-column label="工位ID" align="center" prop="stationId" />
-      <el-table-column label="用户ID" align="center" prop="userId" />
-      <el-table-column label="添加人" align="center" prop="addUserId" />
+      <!-- <el-table-column label="工位绑定编号" align="center" prop="stationUserId" /> -->
+      <el-table-column label="车间名称" align="center" prop="workshopName" />
+      <el-table-column label="工位名称" align="center" prop="stationName" />
+      <el-table-column label="人员" align="center" prop="userName" />
+      <el-table-column label="人员昵称" align="center" prop="userNickName" />
+      <el-table-column label="添加人" align="center" prop="addUserName" />
       <el-table-column label="添加时间" align="center" prop="addTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.addTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.addTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -126,12 +144,37 @@
 
     <!-- 添加或修改工位绑定对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="工位ID" prop="stationId">
-          <el-input v-model="form.stationId" placeholder="请输入工位ID" />
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px" input-width="200px">
+        <el-form-item label="车间" prop="workshopName">
+          <el-input v-model="workshopName" :disabled="true" width = "80px"/>
         </el-form-item>
-        <el-form-item label="用户ID" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户ID" />
+
+        <el-form-item label="工位" prop="stationId">
+          <!-- <el-input v-model="form.stationId" placeholder="请输入工位ID" /> -->
+          <el-select v-model="form.stationId" placeholder="请选择工位" clearable @change="changeStation">
+            <el-option
+              v-for="item in stationList"
+              :key="item.stationList"
+              :label="item.stationName"
+              :value="item.stationId"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="用户名" prop="userName">
+          <el-input v-model="userName" :disabled="true"/>
+        </el-form-item>
+
+        <el-form-item label="用户昵称" prop="userId">
+          <!-- <el-input v-model="form.userId" placeholder="请输入用户ID" /> -->
+          <el-select v-model="form.userId" placeholder="请选择用户" clearable @change="changeUser">
+            <el-option
+              v-for="item in userList"
+              :key="item.userId"
+              :label="item.nickName"
+              :value="item.userId"
+            />
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -144,11 +187,26 @@
 
 <script>
 import { listStationUser, getStationUser, delStationUser, addStationUser, updateStationUser } from "@/api/mes/stationUser";
+import { listStation } from "@/api/mes/station";
+import { listWorkshop } from "@/api/mes/workshop";
+import { listUser } from "@/api/system/user";
 
 export default {
   name: "StationUser",
   data() {
     return {
+      // 用户名
+      userName: null,
+      // 当前车间
+      workshopId: null,
+      // 当前车间名称
+      workshopName: null,
+      // 工位列表
+      stationList: [],
+      // 用户列表
+      userList: [],
+      // 车间列表
+      workshopList: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -185,8 +243,46 @@ export default {
   },
   created() {
     this.getList();
+    this.getStationList();
+    this.getWorkshopList();
+    this.getUserList();
   },
   methods: {
+    /** 当所选用户发送变更时 */
+    changeUser(val) {
+      for(let user of this.userList) {
+        if(user.userId === val) {
+          this.userName = user.userName;
+        }
+      }
+    },
+    /** 当所选工位发生变更时 */
+    changeStation(val) {
+      this.workshopId = this.stationList.find(item => item.stationId === val).workshopId;
+      for (let workshop of this.workshopList) {
+        if (workshop.workshopId === this.workshopId) {
+          this.workshopName = workshop.workshopName;
+        }
+      }
+    },  
+    /** 获取用户列表 */
+    getUserList() {
+      listUser({}).then(response => {
+        this.userList = response.rows;
+      });
+    },
+    /** 获取工位列表 */
+    getStationList() {
+      listStation({}).then(response => {
+        this.stationList = response.rows;
+      });
+    },
+    /** 获取车间列表 */
+    getWorkshopList() {
+      listWorkshop({}).then(response => {
+        this.workshopList = response.rows;
+      });
+    },
     /** 查询工位绑定列表 */
     getList() {
       this.loading = true;
@@ -283,3 +379,20 @@ export default {
   }
 };
 </script>
+
+<style>
+/* .el-form-item {
+  margin-right: 0 !important;
+}
+.el-form-item__label {
+  position: absolute;
+}
+.el-form-item__content {
+  width: 100%;
+  padding-left: 80px;
+} */
+.el-select,
+.el-input_inner {
+  width: 100%;
+}
+</style>

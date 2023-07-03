@@ -293,7 +293,6 @@
         <el-steps :active="100" align-center>
           <!-- 在这里展示根据getRouteProcessList查询到的数据 -->
           <el-step v-for="(item, index) in routeProcessList" :key="item.processIndex" :title="item.processName" />
-          <!-- {{ routeProcessList }} -->
         </el-steps>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -451,7 +450,8 @@ export default {
         materialItemRoute: null,
         materialItemStatus: null,
         materialItemAddTime: null,
-        materialItemComment: null
+        materialItemComment: null,
+        routeProcessList: []
       };
       this.resetForm("form");
     },
@@ -483,6 +483,9 @@ export default {
       const materialItemId = row.materialItemId || this.ids
       getItem(materialItemId).then(response => {
         this.form = response.data;
+        getRoute(response.data.materialItemRoute).then(response2 => {
+          this.routeProcessList = response2.data.routeProcessList;
+        });
         this.open = true;
         this.title = "修改物料信息";
       });
