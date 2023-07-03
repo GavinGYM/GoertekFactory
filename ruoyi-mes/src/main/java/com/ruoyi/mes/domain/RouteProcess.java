@@ -15,6 +15,8 @@ public class RouteProcess extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
+    private String processName;
+
     /** 路线ID */
     private Long routeId;
 
@@ -24,6 +26,10 @@ public class RouteProcess extends BaseEntity
     /** 工序顺序 */
     @Excel(name = "工序顺序")
     private Long processIndex;
+
+    public void setProcessName(String processName) { this.processName = processName; }
+
+    public String getProcessName() { return processName; }
 
     public void setRouteId(Long routeId) 
     {
@@ -59,6 +65,7 @@ public class RouteProcess extends BaseEntity
             .append("routeId", getRouteId())
             .append("processId", getProcessId())
             .append("processIndex", getProcessIndex())
+            .append("processName", getProcessName())
             .toString();
     }
 }

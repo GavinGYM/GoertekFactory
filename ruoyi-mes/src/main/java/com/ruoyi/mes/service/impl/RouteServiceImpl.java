@@ -1,6 +1,10 @@
 package com.ruoyi.mes.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.mes.domain.Process;
+import com.ruoyi.mes.mapper.ProcessMapper;
+import com.ruoyi.mes.service.IProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -23,6 +27,9 @@ public class RouteServiceImpl implements IRouteService
     @Autowired
     private RouteMapper routeMapper;
 
+    @Autowired
+    private ProcessMapper processMapper;
+
     /**
      * 查询工序路线
      * 
@@ -32,7 +39,16 @@ public class RouteServiceImpl implements IRouteService
     @Override
     public Route selectRouteByRouteId(Long routeId)
     {
-        return routeMapper.selectRouteByRouteId(routeId);
+        Route result = routeMapper.selectRouteByRouteId(routeId);
+        List<RouteProcess> routeProcessList = result.getRouteProcessList();
+        for(int i = 0; i<routeProcessList.size(); i++) {
+            RouteProcess item = routeProcessList.get(i);
+            // 获取item对应的processName, 并赋值给item
+            item.setProcessName(processMapper.selectProcessByProcessId(item.getProcessId()).getProcessName());
+            routeProcessList.set(i, item);
+        }
+        result.setRouteProcessList(routeProcessList);
+        return result;
     }
 
     /**

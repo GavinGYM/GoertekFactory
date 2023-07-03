@@ -214,22 +214,44 @@
     <!-- 添加或修改物料信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="物料名称" prop="materialItemName">
-          <el-input v-model="form.materialItemName" placeholder="请输入物料名称" />
-        </el-form-item>
-        <el-form-item label="规格型号" prop="materialItemModel">
-          <el-input v-model="form.materialItemModel" placeholder="请输入规格型号" />
-        </el-form-item>
-        <el-form-item label="计量单位" prop="materialItemUnit">
-          <el-select v-model="form.materialItemUnit" placeholder="请选择计量单位">
-            <el-option
-              v-for="dict in dict.type.mes_unit"
-              :key="dict.value"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
-            ></el-option>
-          </el-select>
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="物料名称" prop="materialItemName">
+              <el-input v-model="form.materialItemName" placeholder="请输入物料名称" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="规格型号" prop="materialItemModel">
+              <el-input v-model="form.materialItemModel" placeholder="请输入规格型号" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="计量单位" prop="materialItemUnit">
+              <el-select v-model="form.materialItemUnit" placeholder="请选择计量单位">
+                <el-option
+                  v-for="dict in dict.type.mes_unit"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="parseInt(dict.value)"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="物料类型" prop="materialItemType">
+              <el-select v-model="form.materialItemType" placeholder="请选择物料类型">
+                <el-option
+                  v-for="dict in dict.type.material_type"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="parseInt(dict.value)"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="物料分类" prop="materialItemClass">
           <!-- <el-input v-model="form.materialItemClass" placeholder="请输入物料分类" /> -->
           <treeselect 
@@ -238,42 +260,41 @@
             :show-count="true" 
             placeholder="请选择物料分类" 
           />
-        </el-form-item>
-        <el-form-item label="物料类型" prop="materialItemType">
-          <el-select v-model="form.materialItemType" placeholder="请选择物料类型">
-            <el-option
-              v-for="dict in dict.type.material_type"
-              :key="dict.value"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="工序路线" prop="materialItemRoute">
-          <!-- <el-input v-model="form.materialItemRoute" placeholder="请输入工序路线" /> -->
-
-            <el-select v-model="form.materialItemRoute" placeholder="请输入工序路线" clearable>
-              <el-option
-                v-for="item in routeList"
-                :key="item.routeId"
-                :label="item.routeName"
-                :value="item.routeId"
-              />
-            </el-select>
-        
-         </el-form-item>
-        <el-form-item label="状态" prop="materialItemStatus">
-          <el-radio-group v-model="form.materialItemStatus">
-            <el-radio
-              v-for="dict in dict.type.sys_normal_disable"
-              :key="dict.value"
-              :label="parseInt(dict.value)"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
-        </el-form-item>
+        </el-form-item>  
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="工序路线" prop="materialItemRoute">
+              <!-- <el-input v-model="form.materialItemRoute" placeholder="请输入工序路线" /> -->
+              <el-select v-model="form.materialItemRoute" placeholder="请输入工序路线" clearable  @change="getRouteProcessList">
+                <el-option
+                  v-for="item in routeList"
+                  :key="item.routeId"
+                  :label="item.routeName"
+                  :value="item.routeId"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="状态" prop="materialItemStatus">
+              <el-radio-group v-model="form.materialItemStatus">
+                <el-radio
+                  v-for="dict in dict.type.sys_normal_disable"
+                  :key="dict.value"
+                  :label="parseInt(dict.value)"
+                >{{dict.label}}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-form-item label="备注" prop="materialItemComment">
           <el-input v-model="form.materialItemComment" type="textarea" placeholder="请输入内容" />
         </el-form-item>
+        <el-steps :active="100" align-center>
+          <!-- 在这里展示根据getRouteProcessList查询到的数据 -->
+          <el-step v-for="(item, index) in routeProcessList" :key="item.processIndex" :title="item.processName" />
+          <!-- {{ routeProcessList }} -->
+        </el-steps>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -286,7 +307,7 @@
 <script>
 import { listItem, getItem, delItem, addItem, updateItem } from "@/api/mes/item";
 import { listMaterial, getMaterial } from "@/api/mes/material";
-import { listRoute } from "@/api/mes/route";
+import { listRoute, getRoute } from "@/api/mes/route";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
@@ -304,6 +325,8 @@ export default {
         children: "children",
         label: "label"
       },
+      // 工序与路线关系表格数据
+      routeProcessList: [],
       // 工序路线数据
       routeList: [],
       // 遮罩层
@@ -364,6 +387,13 @@ export default {
     //     return response ? response.data.materialName : null;
     //   });
     // },
+
+    /** 查询具体工序路线 */
+    getRouteProcessList(routeId) {
+      getRoute(routeId).then(response => {
+        this.routeProcessList = response.data.routeProcessList;
+      });
+    },
     /** 查询工序路线列表 */
     getRouteList() {
       listRoute({}).then(response => {
