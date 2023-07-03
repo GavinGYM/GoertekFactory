@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.StationUserMapper">
+    
+    <resultMap type="StationUser" id="StationUserResult">
+        <result property="stationUserId"    column="station_user_id"    />
+        <result property="stationId"    column="station_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="addUserId"    column="add_user_id"    />
+        <result property="addTime"    column="add_time"    />
+    </resultMap>
+
+    <sql id="selectStationUserVo">
+        select station_user_id, station_id, user_id, add_user_id, add_time from mes_station_user
+    </sql>
+
+    <select id="selectStationUserList" parameterType="StationUser" resultMap="StationUserResult">
+        <include refid="selectStationUserVo"/>
+        <where>  
+            <if test="stationId != null "> and station_id = #{stationId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="addUserId != null "> and add_user_id = #{addUserId}</if>
+            <if test="addTime != null "> and add_time = #{addTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectStationUserByStationUserId" parameterType="Long" resultMap="StationUserResult">
+        <include refid="selectStationUserVo"/>
+        where station_user_id = #{stationUserId}
+    </select>
+        
+    <insert id="insertStationUser" parameterType="StationUser">
+        insert into mes_station_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stationUserId != null">station_user_id,</if>
+            <if test="stationId != null">station_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="addUserId != null">add_user_id,</if>
+            <if test="addTime != null">add_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stationUserId != null">#{stationUserId},</if>
+            <if test="stationId != null">#{stationId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="addUserId != null">#{addUserId},</if>
+            <if test="addTime != null">#{addTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStationUser" parameterType="StationUser">
+        update mes_station_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stationId != null">station_id = #{stationId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="addUserId != null">add_user_id = #{addUserId},</if>
+            <if test="addTime != null">add_time = #{addTime},</if>
+        </trim>
+        where station_user_id = #{stationUserId}
+    </update>
+
+    <delete id="deleteStationUserByStationUserId" parameterType="Long">
+        delete from mes_station_user where station_user_id = #{stationUserId}
+    </delete>
+
+    <delete id="deleteStationUserByStationUserIds" parameterType="String">
+        delete from mes_station_user where station_user_id in 
+        <foreach item="stationUserId" collection="array" open="(" separator="," close=")">
+            #{stationUserId}
+        </foreach>
+    </delete>
+</mapper>
