@@ -406,14 +406,14 @@
         </el-row>
 
         <el-divider content-position="center">工单工序信息</el-divider>
-        <el-row :gutter="10" class="mb8">
+        <!-- <el-row :gutter="10" class="mb8">
           <el-col :span="1.5">
             <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddOrderRoute">添加</el-button>
           </el-col>
           <el-col :span="1.5">
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDeleteOrderRoute">删除</el-button>
           </el-col>
-        </el-row>
+        </el-row> -->
         <el-table :data="orderRouteList" :row-class-name="rowOrderRouteIndex" @selection-change="handleOrderRouteSelectionChange" ref="orderRoute">
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="processIndex" width="50"/>
@@ -437,14 +437,22 @@
               <el-input v-model="scope.row.processIndex" placeholder="请输入工序顺序" />
             </template>
           </el-table-column> -->
-          <el-table-column label="车间编号" prop="workshopId" width="auto">
+          <el-table-column label="工位" prop="stationId" width="auto">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.workshopId" placeholder="请输入车间编号" />
+              <el-select v-model="scope.row.stationId" placeholder="请选择工位" clearable @change="changeStation(scope)">
+                <el-option
+                  v-for="item in stationList"
+                  :key="item.stationList"
+                  :label="item.stationName"
+                  :value="item.stationId"
+                />
+              </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="工位编号" prop="stationId" width="auto">
+          
+          <el-table-column label="车间编号" prop="workshopName" width="auto">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.stationId" placeholder="请输入工位编号" />
+              <el-input v-model="scope.row.workshopName" placeholder="请输入车间编号" :disabled="true"/>
             </template>
           </el-table-column>
           <!-- <el-table-column label="完成数量" prop="orderFinishNumber" width="150">
@@ -466,6 +474,8 @@
 import { listItem, getItem, delItem, addItem, updateItem } from "@/api/mes/item";
 import { listMaterial, getMaterial } from "@/api/mes/material";
 import { listRoute, getRoute } from "@/api/mes/route";
+import { listStation } from "@/api/mes/station";
+import { listWorkshop } from "@/api/mes/workshop";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { listOrder, getOrder, delOrder, addOrder, updateOrder } from "@/api/mes/order";
@@ -475,7 +485,10 @@ export default {
   dicts: ['mes_order_status', 'material_type', 'sys_normal_disable', 'mes_unit'],
   data() {
     return {
-
+      // 工位列表
+      stationList: [],
+      // 车间列表
+      workshopList: [],
       // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓查询物料产品弹窗所用数据↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
       // 物料查询参数
       materialQueryParams: {
@@ -584,23 +597,47 @@ export default {
   },
   created() {
     this.getList();
+    this.getStationList();
+    this.getWorkshopList();
     this.materialgetList();
     this.getTreeselect();
     this.getRouteList();
     this.username = this.$store.state.user.name;
   },
   methods: {
+    /** 获取车间列表 */
+    getWorkshopList() {
+      listWorkshop({}).then(response => {
+        this.workshopList = response.rows;
+      });
+    },
+    /** 当所选工位发生变更时 */
+    changeStation(scope) {
+      const stationId = scope.row.stationId;
+      const workshop = this.workshopList.find(item => item.workshopId === this.stationList.find(item => item.stationId === stationId).workshopId);
+      scope.row.workshopId = workshop.workshopId;
+      scope.row.workshopName = workshop.workshopName;
+
+      // this.workshopId = this.stationList.find(item => item.stationId === val).workshopId;
+      // for (let workshop of this.workshopList) {
+      //   if (workshop.workshopId === this.workshopId) {
+      //     this.workshopName = workshop.workshopName;
+      //   }
+      // }
+    },
+    /** 获取工位列表 */
+    getStationList() {
+      listStation({}).then(response => {
+        this.stationList = response.rows;
+      });
+    },
     // 处理物料点击事件
     handleMaterialRowClick(data) {
-      console.log(data);
-
       this.form.orderMaterialName = data.materialItemName;
       this.form.orderMaterialId = data.materialItemId;
       this.form.orderMaterialModel = data.materialItemModel;
       this.form.orderMaterialUnit = data.materialItemUnit;
       this.getRouteProcessList(data.materialItemRoute);
-      // this.orderRouteList.routeId = this.routeProcessList.routeId;
-
       this.materialOpen = false;
     },
     // 节点单击事件

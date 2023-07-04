@@ -1,6 +1,9 @@
 package com.ruoyi.mes.service.impl;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -57,6 +60,8 @@ public class OrderServiceImpl implements IOrderService
     @Override
     public int insertOrder(Order order)
     {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        order.setOrderCreator(loginUser.getUser().getUserId());
         int rows = orderMapper.insertOrder(order);
         insertOrderRoute(order);
         return rows;
