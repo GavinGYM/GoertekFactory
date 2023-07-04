@@ -190,6 +190,115 @@
       @pagination="getList"
     />
 
+    <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 物料查询弹出层 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ -->
+    <el-dialog :title="materialTitle" :visible.sync="materialOpen" width="950px" append-to-body>
+
+      <el-row :gutter="20">
+        <!--物料分类-->
+        <el-col :span="6" :xs="24">
+          <div class="head-container">
+            <el-input
+              v-model="materialName"
+              placeholder="请输入物料分类"
+              clearable
+              size="small"
+              prefix-icon="el-icon-search"
+              style="margin-bottom: 20px"
+            />
+          </div>
+          <div class="head-container">
+            <el-tree
+              :data="materialOptions"
+              :props="defaultProps"
+              :expand-on-click-node="false"
+              :filter-node-method="filterNode"
+              ref="tree"
+              node-key="id"
+              default-expand-all
+              highlight-current
+              @node-click="handleNodeClick"
+            />
+          </div>
+        </el-col>
+        <el-col :span="18" :xs="24">
+          <el-form :model="materialQueryParams" ref="materialQueryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+            <el-form-item label="物料名称" prop="materialItemName">
+              <el-input
+                v-model="materialQueryParams.materialItemName"
+                placeholder="请输入物料名称"
+                clearable
+                @keyup.enter.native="handleMaterialQuery"
+              />
+            </el-form-item>
+            <el-form-item label="规格型号" prop="materialItemModel">
+              <el-input
+                v-model="materialQueryParams.materialItemModel"
+                placeholder="请输入规格型号"
+                clearable
+                @keyup.enter.native="handleMaterialQuery"
+              />
+            </el-form-item>
+            <el-form-item label="物料类型" prop="materialItemType">
+              <el-select v-model="materialQueryParams.materialItemType" placeholder="请选择物料类型" clearable>
+                <el-option
+                  v-for="dict in dict.type.material_type"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="dict.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" icon="el-icon-search" size="mini" @click="handleMaterialQuery">搜索</el-button>
+              <el-button icon="el-icon-refresh" size="mini" @click="resetMaterialQuery">重置</el-button>
+            </el-form-item>
+          </el-form>
+
+          <el-table v-loading="materialLoading" :data="itemList" @row-click="handleMaterialRowClick" @selection-change="handleSelectionChange">
+            <!-- <el-table-column type="selection" width="55" align="center" /> -->
+            <el-table-column label="编号" align="center" prop="materialItemId" />
+            <el-table-column label="物料名称" align="center" prop="materialItemName" />
+            <el-table-column label="规格型号" align="center" prop="materialItemModel" />
+            <el-table-column label="计量单位" align="center" prop="materialItemUnit">
+              <template slot-scope="scope">
+                <dict-tag :options="dict.type.mes_unit" :value="scope.row.materialItemUnit"/>
+              </template>
+            </el-table-column>
+            <!-- <el-table-column label="物料分类" align="center" prop="materialItemClass">
+            <template slot-scope="scope">
+              {{ getMaterialClassName(scope.row.materialItemClass) }}
+            </template>
+          </el-table-column> -->
+            <el-table-column label="物料类型" align="center" prop="materialItemType">
+              <template slot-scope="scope">
+                <dict-tag :options="dict.type.material_type" :value="scope.row.materialItemType"/>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" align="center" prop="materialItemStatus">
+              <template slot-scope="scope">
+                <dict-tag :options="dict.type.sys_normal_disable" :value="scope.row.materialItemStatus"/>
+              </template>
+            </el-table-column>
+            <el-table-column label="添加时间" align="center" prop="materialItemAddTime" width="180">
+              <template slot-scope="scope">
+                <span>{{ parseTime(scope.row.materialItemAddTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        
+          <pagination
+            v-show="total > 0"
+            :total="materialTotal"
+            :page.sync="materialQueryParams.pageNum"
+            :limit.sync="materialQueryParams.pageSize"
+            @pagination="materialgetList"
+          />
+        </el-col>
+      </el-row>
+
+    </el-dialog>
+    <!-- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 物料查询弹出层 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ -->
+
     <!-- 添加或修改生产工单对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="900px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
@@ -201,12 +310,12 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="创建人" prop="orderCreator">
-              <el-input v-model="form.orderCreator" placeholder="请输入创建人" />
+              <el-input v-model="username" placeholder="请输入创建人" :disabled="true" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="状态" prop="orderStatus">
-              <el-select v-model="form.orderStatus" placeholder="请选择状态">
+              <el-select v-model="form.orderStatus" placeholder="请选择状态" :disabled="true">
                 <el-option
                   v-for="dict in dict.type.mes_order_status"
                   :key="dict.value"
@@ -221,17 +330,19 @@
         <el-row>  
           <el-col :span="8">
             <el-form-item label="物料" prop="orderMaterialName">
-              <el-input v-model="form.orderMaterialName" placeholder="请输入物料" />
+              <el-input v-model="form.orderMaterialName" placeholder="请输入物料">
+                <el-button slot="append" icon="el-icon-search" @click="handleMaterialQueryOpen"></el-button>
+              </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="物料编号" prop="orderMaterialId">
-              <el-input v-model="form.orderMaterialId" placeholder="请输入物料编号" />
+              <el-input v-model="form.orderMaterialId" placeholder="请输入物料编号" :disabled="true" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item label="规格型号" prop="orderMaterialModel">
-              <el-input v-model="form.orderMaterialModel" placeholder="请输入规格型号" />
+              <el-input v-model="form.orderMaterialModel" placeholder="请输入规格型号" :disabled="true" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -239,7 +350,14 @@
         <el-row>
           <el-col :span="8">
             <el-form-item label="计量单位" prop="orderMaterialUnit">
-              <el-input v-model="form.orderMaterialUnit" placeholder="请输入计量单位" />
+              <el-select v-model="form.orderMaterialUnit" placeholder="请选择计量单位" :disabled="true">
+                <el-option
+                  v-for="dict in dict.type.mes_unit"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="parseInt(dict.value)"
+                ></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -262,24 +380,26 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="开始生产" prop="orderStartDate">
+            <el-form-item label="开始生产" prop="orderStartDate" >
               <el-date-picker clearable
                 v-model="form.orderStartDate"
                 type="date"
                 value-format="yyyy-MM-dd"
                 style="width:100%;"
-                placeholder="请选择开始生产日期">
+                :disabled="true"
+                placeholder="暂未开始生产">
               </el-date-picker>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="实际完工" prop="orderEndDate">
+            <el-form-item label="实际完工" prop="orderEndDate" >
               <el-date-picker clearable
                 v-model="form.orderEndDate"
                 type="date"
                 value-format="yyyy-MM-dd"
                 style="width:100%;"
-                placeholder="请选择实际完工日期">
+                :disabled="true"
+                placeholder="暂未完工">
               </el-date-picker>
             </el-form-item>
           </el-col>
@@ -296,37 +416,42 @@
         </el-row>
         <el-table :data="orderRouteList" :row-class-name="rowOrderRouteIndex" @selection-change="handleOrderRouteSelectionChange" ref="orderRoute">
           <el-table-column type="selection" width="50" align="center" />
-          <el-table-column label="序号" align="center" prop="index" width="50"/>
-          <el-table-column label="工序路线编号" prop="routeId" width="150">
+          <el-table-column label="序号" align="center" prop="processIndex" width="50"/>
+          <!-- <el-table-column label="工序路线编号" prop="routeId" width="150">
             <template slot-scope="scope">
               <el-input v-model="scope.row.routeId" placeholder="请输入工序路线编号" />
             </template>
-          </el-table-column>
-          <el-table-column label="工序编号" prop="processId" width="150">
+          </el-table-column> -->
+          <!-- <el-table-column label="工序编号" prop="processId" width="auto">
             <template slot-scope="scope">
               <el-input v-model="scope.row.processId" placeholder="请输入工序编号" />
             </template>
+          </el-table-column> -->
+          <el-table-column label="工序" prop="processName" width="auto">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.processName" placeholder="请输入工序编号" :disabled="true"/>
+              </template>
           </el-table-column>
-          <el-table-column label="工序顺序" prop="processIndex" width="150">
+          <!-- <el-table-column label="工序顺序" prop="processIndex" width="150">
             <template slot-scope="scope">
               <el-input v-model="scope.row.processIndex" placeholder="请输入工序顺序" />
             </template>
-          </el-table-column>
-          <el-table-column label="车间编号" prop="workshopId" width="150">
+          </el-table-column> -->
+          <el-table-column label="车间编号" prop="workshopId" width="auto">
             <template slot-scope="scope">
               <el-input v-model="scope.row.workshopId" placeholder="请输入车间编号" />
             </template>
           </el-table-column>
-          <el-table-column label="工位编号" prop="stationId" width="150">
+          <el-table-column label="工位编号" prop="stationId" width="auto">
             <template slot-scope="scope">
               <el-input v-model="scope.row.stationId" placeholder="请输入工位编号" />
             </template>
           </el-table-column>
-          <el-table-column label="完成数量" prop="orderFinishNumber" width="150">
+          <!-- <el-table-column label="完成数量" prop="orderFinishNumber" width="150">
             <template slot-scope="scope">
               <el-input v-model="scope.row.orderFinishNumber" placeholder="请输入完成数量" />
             </template>
-          </el-table-column>
+          </el-table-column> -->
         </el-table>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -338,13 +463,60 @@
 </template>
 
 <script>
+import { listItem, getItem, delItem, addItem, updateItem } from "@/api/mes/item";
+import { listMaterial, getMaterial } from "@/api/mes/material";
+import { listRoute, getRoute } from "@/api/mes/route";
+import Treeselect from "@riophae/vue-treeselect";
+import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { listOrder, getOrder, delOrder, addOrder, updateOrder } from "@/api/mes/order";
 
 export default {
   name: "Order",
-  dicts: ['mes_order_status'],
+  dicts: ['mes_order_status', 'material_type', 'sys_normal_disable', 'mes_unit'],
   data() {
     return {
+
+      // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓查询物料产品弹窗所用数据↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+      // 物料查询参数
+      materialQueryParams: {
+        pageNum: 1,
+        pageSize: 10,
+        materialItemName: null,
+        materialItemModel: null,
+        materialItemUnit: null,
+        materialItemClass: null,
+        materialItemType: null,
+        materialItemRoute: null,
+        materialItemStatus: null,
+        materialItemAddTime: null,
+      },
+      // 物料产品表格数据
+      itemList: [],
+      // 物料产品总条数
+      materialTotal: 0,
+      // 物料产品遮罩层
+      materialLoading: true,
+      // 物料类别
+      materialName: undefined,
+      // 物料分类树选项
+      materialOptions: [],
+      defaultProps: {
+        children: "children",
+        label: "label"
+      },
+      // 工序与路线关系表格数据
+      routeProcessList: [],
+      // 工序路线数据
+      routeList: [],
+      // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑查询物料产品弹窗所用数据↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+
+      // 当前用户名
+      username: null,
+      // 当前用户id
+      userId: null,
+
+      // 工序与路线关系表格数据
+      routeProcessList: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -367,6 +539,10 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示物料查询弹出层
+      materialOpen: false,
+      // 物料查询弹出层标题
+      materialTitle: "",
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -374,7 +550,7 @@ export default {
         orderId: null,
         orderBatchId: null,
         orderCreator: null,
-        orderStatus: null,
+        orderStatus: 0,
         orderMaterialId: null,
         orderDeadline: null,
         orderStartDate: null,
@@ -400,10 +576,87 @@ export default {
       }
     };
   },
+  watch: {
+    // 根据名称筛选物料树
+    materialName(val) {
+      this.$refs.tree.filter(val);
+    }
+  },
   created() {
     this.getList();
+    this.materialgetList();
+    this.getTreeselect();
+    this.getRouteList();
+    this.username = this.$store.state.user.name;
   },
   methods: {
+    // 处理物料点击事件
+    handleMaterialRowClick(data) {
+      console.log(data);
+
+      this.form.orderMaterialName = data.materialItemName;
+      this.form.orderMaterialId = data.materialItemId;
+      this.form.orderMaterialModel = data.materialItemModel;
+      this.form.orderMaterialUnit = data.materialItemUnit;
+      this.getRouteProcessList(data.materialItemRoute);
+      // this.orderRouteList.routeId = this.routeProcessList.routeId;
+
+      this.materialOpen = false;
+    },
+    // 节点单击事件
+    handleNodeClick(data) {
+      this.materialQueryParams.materialItemClass = data.id;
+      this.handleMaterialQuery();
+    },
+    /** 搜索按钮操作 */
+    handleMaterialQuery() {
+      this.materialQueryParams.pageNum = 1;
+      this.materialgetList();
+    },
+    /** 重置按钮操作 */
+    resetMaterialQuery() {
+      this.resetForm("materialQueryForm");
+      this.materialQueryParams.materialItemClass = null;
+      this.handleMaterialQuery();
+    },
+    /** 查询具体工序路线 */
+    getRouteProcessList(routeId) {
+      getRoute(routeId).then(response => {
+        // this.routeProcessList = response.data.routeProcessList;
+        this.orderRouteList = response.data.routeProcessList;
+      });
+    },
+    /** 查询工序路线列表 */
+    getRouteList() {
+      listRoute({}).then(response => {
+        this.routeList = response.rows;
+      });
+    },
+    /** 查询物料分类下拉树结构 */
+    getTreeselect() {
+      listMaterial().then(response => {
+        response.data = response.data.map(obj => {
+          obj.id = obj.materialId;
+          obj.label = obj.materialName;
+          delete obj.materialId;
+          delete obj.materialName;
+          return obj;
+        });
+        const data = { id: 0, label: '所有物料', children: [] };
+        data.children = this.handleTree(response.data, "id", "materialParentId");
+        this.materialOptions.push(data);
+      });
+    },
+
+    /** 查询物料产品列表 */
+    materialgetList() {
+      this.materialLoading = true;
+      listItem(this.materialQueryParams).then(response => {
+        this.itemList = response.rows;
+        this.materialTotal = response.materialTotal;
+        this.materialLoading = false;
+      });
+    },
     /** 查询生产工单列表 */
     getList() {
       this.loading = true;
@@ -424,7 +677,7 @@ export default {
         orderId: null,
         orderBatchId: null,
         orderCreator: null,
-        orderStatus: null,
+        orderStatus: 0,
         orderMaterialId: null,
         orderDeadline: null,
         orderStartDate: null,
@@ -432,6 +685,7 @@ export default {
         orderNumber: null,
         orderCreateTime: null
       };
+      this.routeProcessList = [];
       this.orderRouteList = [];
       this.resetForm("form");
     },
@@ -456,6 +710,11 @@ export default {
       this.reset();
       this.open = true;
       this.title = "添加生产工单";
+    },
+    /** 物料查询按钮操作 */
+    handleMaterialQueryOpen() {
+      this.materialOpen = true;
+      this.materialTitle = "物料产品选择";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
