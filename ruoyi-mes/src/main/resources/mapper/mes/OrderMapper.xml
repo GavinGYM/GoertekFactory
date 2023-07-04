@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.OrderMapper">
+    
+    <resultMap type="Order" id="OrderResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="orderBatchId"    column="order_batch_id"    />
+        <result property="orderCreator"    column="order_creator"    />
+        <result property="orderStatus"    column="order_status"    />
+        <result property="orderMaterialId"    column="order_material_id"    />
+        <result property="orderDeadline"    column="order_deadline"    />
+        <result property="orderStartDate"    column="order_start_date"    />
+        <result property="orderEndDate"    column="order_end_date"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="orderCreateTime"    column="order_create_time"    />
+    </resultMap>
+
+    <resultMap id="OrderOrderRouteResult" type="Order" extends="OrderResult">
+        <collection property="orderRouteList" notNullColumn="sub_order_id" javaType="java.util.List" resultMap="OrderRouteResult" />
+    </resultMap>
+
+    <resultMap type="OrderRoute" id="OrderRouteResult">
+        <result property="orderId"    column="sub_order_id"    />
+        <result property="routeId"    column="sub_route_id"    />
+        <result property="processId"    column="sub_process_id"    />
+        <result property="processIndex"    column="sub_process_index"    />
+        <result property="workshopId"    column="sub_workshop_id"    />
+        <result property="stationId"    column="sub_station_id"    />
+        <result property="orderFinishNumber"    column="sub_order_finish_number"    />
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select order_id, order_batch_id, order_creator, order_status, order_material_id, order_deadline, order_start_date, order_end_date, order_number, order_create_time from mes_order
+    </sql>
+
+    <select id="selectOrderList" parameterType="Order" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        <where>  
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="orderBatchId != null "> and order_batch_id = #{orderBatchId}</if>
+            <if test="orderCreator != null "> and order_creator = #{orderCreator}</if>
+            <if test="orderStatus != null "> and order_status = #{orderStatus}</if>
+            <if test="orderMaterialId != null "> and order_material_id = #{orderMaterialId}</if>
+            <if test="orderDeadline != null "> and order_deadline = #{orderDeadline}</if>
+            <if test="orderStartDate != null "> and order_start_date = #{orderStartDate}</if>
+            <if test="orderEndDate != null "> and order_end_date = #{orderEndDate}</if>
+            <if test="orderNumber != null "> and order_number = #{orderNumber}</if>
+        </where>
+    </select>
+    
+    <select id="selectOrderByOrderId" parameterType="Long" resultMap="OrderOrderRouteResult">
+        select a.order_id, a.order_batch_id, a.order_creator, a.order_status, a.order_material_id, a.order_deadline, a.order_start_date, a.order_end_date, a.order_number, a.order_create_time,
+ b.order_id as sub_order_id, b.route_id as sub_route_id, b.process_id as sub_process_id, b.process_index as sub_process_index, b.workshop_id as sub_workshop_id, b.station_id as sub_station_id, b.order_finish_number as sub_order_finish_number
+        from mes_order a
+        left join mes_order_route b on b.order_id = a.order_id
+        where a.order_id = #{orderId}
+    </select>
+        
+    <insert id="insertOrder" parameterType="Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into mes_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderBatchId != null">order_batch_id,</if>
+            <if test="orderCreator != null">order_creator,</if>
+            <if test="orderStatus != null">order_status,</if>
+            <if test="orderMaterialId != null">order_material_id,</if>
+            <if test="orderDeadline != null">order_deadline,</if>
+            <if test="orderStartDate != null">order_start_date,</if>
+            <if test="orderEndDate != null">order_end_date,</if>
+            <if test="orderNumber != null">order_number,</if>
+            <if test="orderCreateTime != null">order_create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderBatchId != null">#{orderBatchId},</if>
+            <if test="orderCreator != null">#{orderCreator},</if>
+            <if test="orderStatus != null">#{orderStatus},</if>
+            <if test="orderMaterialId != null">#{orderMaterialId},</if>
+            <if test="orderDeadline != null">#{orderDeadline},</if>
+            <if test="orderStartDate != null">#{orderStartDate},</if>
+            <if test="orderEndDate != null">#{orderEndDate},</if>
+            <if test="orderNumber != null">#{orderNumber},</if>
+            <if test="orderCreateTime != null">#{orderCreateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOrder" parameterType="Order">
+        update mes_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderBatchId != null">order_batch_id = #{orderBatchId},</if>
+            <if test="orderCreator != null">order_creator = #{orderCreator},</if>
+            <if test="orderStatus != null">order_status = #{orderStatus},</if>
+            <if test="orderMaterialId != null">order_material_id = #{orderMaterialId},</if>
+            <if test="orderDeadline != null">order_deadline = #{orderDeadline},</if>
+            <if test="orderStartDate != null">order_start_date = #{orderStartDate},</if>
+            <if test="orderEndDate != null">order_end_date = #{orderEndDate},</if>
+            <if test="orderNumber != null">order_number = #{orderNumber},</if>
+            <if test="orderCreateTime != null">order_create_time = #{orderCreateTime},</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+
+    <delete id="deleteOrderByOrderId" parameterType="Long">
+        delete from mes_order where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteOrderByOrderIds" parameterType="String">
+        delete from mes_order where order_id in 
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteOrderRouteByOrderIds" parameterType="String">
+        delete from mes_order_route where order_id in 
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteOrderRouteByOrderId" parameterType="Long">
+        delete from mes_order_route where order_id = #{orderId}
+    </delete>
+
+    <insert id="batchOrderRoute">
+        insert into mes_order_route( order_id, route_id, process_id, process_index, workshop_id, station_id, order_finish_number) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.orderId}, #{item.routeId}, #{item.processId}, #{item.processIndex}, #{item.workshopId}, #{item.stationId}, #{item.orderFinishNumber})
+        </foreach>
+    </insert>
+</mapper>
