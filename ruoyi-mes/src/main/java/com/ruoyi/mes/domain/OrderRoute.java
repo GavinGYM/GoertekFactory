@@ -26,6 +26,10 @@ public class OrderRoute extends BaseEntity
     @Excel(name = "工序编号")
     private Long processId;
 
+    /** 工序名称 */
+    @Excel(name = "工序名称")
+    private String processName;
+
     /** 工序顺序 */
     @Excel(name = "工序顺序")
     private Long processIndex;
@@ -33,6 +37,10 @@ public class OrderRoute extends BaseEntity
     /** 车间编号 */
     @Excel(name = "车间编号")
     private Long workshopId;
+
+    /** 车间名称 */
+    @Excel(name = "车间名称")
+    private String workshopName;
 
     /** 工位编号 */
     @Excel(name = "工位编号")
@@ -69,6 +77,17 @@ public class OrderRoute extends BaseEntity
     {
         return processId;
     }
+
+    public void setProcessName(String processName)
+    {
+        this.processName = processName;
+    }
+
+    public String getProcessName()
+    {
+        return processName;
+    }
+
     public void setProcessIndex(Long processIndex) 
     {
         this.processIndex = processIndex;
@@ -87,6 +106,17 @@ public class OrderRoute extends BaseEntity
     {
         return workshopId;
     }
+
+    public void setWorkshopName(String workshopName)
+    {
+        this.workshopName = workshopName;
+    }
+
+    public String getWorkshopName()
+    {
+        return workshopName;
+    }
+
     public void setStationId(Long stationId) 
     {
         this.stationId = stationId;
@@ -116,6 +146,8 @@ public class OrderRoute extends BaseEntity
             .append("workshopId", getWorkshopId())
             .append("stationId", getStationId())
             .append("orderFinishNumber", getOrderFinishNumber())
+            .append("processName", getProcessName())
+            .append("workshopName", getWorkshopName())
             .toString();
     }
 }

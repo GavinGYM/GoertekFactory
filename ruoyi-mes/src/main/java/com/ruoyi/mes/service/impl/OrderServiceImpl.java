@@ -4,6 +4,12 @@ import java.util.List;
 
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.mes.domain.Material;
+import com.ruoyi.mes.domain.MaterialItem;
+import com.ruoyi.mes.mapper.MaterialItemMapper;
+import com.ruoyi.mes.mapper.ProcessMapper;
+import com.ruoyi.mes.mapper.WorkshopMapper;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -26,6 +32,15 @@ public class OrderServiceImpl implements IOrderService
     @Autowired
     private OrderMapper orderMapper;
 
+    @Autowired
+    private MaterialItemMapper materialItemMapper;
+
+    @Autowired
+    private ProcessMapper processMapper;
+
+    @Autowired
+    private WorkshopMapper workshopMapper;
+
     /**
      * 查询生产工单
      * 
@@ -47,7 +62,21 @@ public class OrderServiceImpl implements IOrderService
     @Override
     public List<Order> selectOrderList(Order order)
     {
-        return orderMapper.selectOrderList(order);
+        List<Order> orderList = orderMapper.selectOrderList(order);
+        for(Order order1 : orderList){
+//            List<OrderRoute> orderRouteList = order1.getOrderRouteList();
+//            if(orderRouteList!=null) {
+//                for(OrderRoute orderRoute : orderRouteList){
+//                    orderRoute.setProcessName(processMapper.selectProcessByProcessId(orderRoute.getProcessId()).getProcessName());
+//                    orderRoute.setWorkshopName(workshopMapper.selectWorkshopByWorkshopId(orderRoute.getWorkshopId()).getWorkshopName());
+//                }
+//            }
+//            order1.setOrderRouteList(orderRouteList);
+            MaterialItem materialItem = materialItemMapper.selectMaterialItemByMaterialItemId(order1.getOrderMaterialId());
+            order1.setOrderMaterialName(materialItem.getMaterialItemName());
+            order1.setOrderMaterialUnit(materialItem.getMaterialItemUnit());
+        }
+        return orderList;
     }
 
     /**

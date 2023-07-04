@@ -38,6 +38,14 @@ public class Order extends BaseEntity
     @Excel(name = "物料")
     private Long orderMaterialId;
 
+    /** 物料名称 */
+    @Excel(name = "物料名称")
+    private String orderMaterialName;
+
+    /** 物料单位 */
+    @Excel(name = "物料单位")
+    private Long orderMaterialUnit;
+
     /** 计划完工日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "计划完工日期", width = 30, dateFormat = "yyyy-MM-dd")
@@ -115,6 +123,25 @@ public class Order extends BaseEntity
         this.orderDeadline = orderDeadline;
     }
 
+    public void setOrderMaterialName(String orderMaterialName)
+    {
+        this.orderMaterialName = orderMaterialName;
+    }
+    public String getOrderMaterialName()
+    {
+        return orderMaterialName;
+    }
+
+    public void setOrderMaterialUnit(Long orderMaterialUnit)
+    {
+        this.orderMaterialUnit = orderMaterialUnit;
+    }
+
+    public Long getOrderMaterialUnit()
+    {
+        return orderMaterialUnit;
+    }
+
     public Date getOrderDeadline() 
     {
         return orderDeadline;
@@ -180,6 +207,8 @@ public class Order extends BaseEntity
             .append("orderNumber", getOrderNumber())
             .append("orderCreateTime", getOrderCreateTime())
             .append("orderRouteList", getOrderRouteList())
+            .append("orderMaterialName", getOrderMaterialName())
+            .append("orderMaterialUnit", getOrderMaterialUnit())
             .toString();
     }
 }

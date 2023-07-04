@@ -1,87 +1,99 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="工单号" prop="orderId">
-        <el-input
-          v-model="queryParams.orderId"
-          placeholder="请输入工单号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="批次号" prop="orderBatchId">
-        <el-input
-          v-model="queryParams.orderBatchId"
-          placeholder="请输入批次号"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <!-- <el-form-item label="创建人" prop="orderCreator">
-        <el-input
-          v-model="queryParams.orderCreator"
-          placeholder="请输入创建人"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item> -->
-      <el-form-item label="状态" prop="orderStatus">
-        <el-select v-model="queryParams.orderStatus" placeholder="请选择状态" clearable>
-          <el-option
-            v-for="dict in dict.type.mes_order_status"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="false" v-show="showSearch" label-width="68px">
+      <el-row>
+        <el-col :span="5">
+          <el-form-item label="工单号" prop="orderId">
+            <el-input
+              v-model="queryParams.orderId"
+              placeholder="请输入工单号"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col :span="5">
+          <el-form-item label="批次号" prop="orderBatchId">
+            <el-input
+              v-model="queryParams.orderBatchId"
+              placeholder="请输入批次号"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+        </el-col>
+          <!-- <el-form-item label="创建人" prop="orderCreator">
+          <el-input
+            v-model="queryParams.orderCreator"
+            placeholder="请输入创建人"
+            clearable
+            @keyup.enter.native="handleQuery"
           />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="物料" prop="orderMaterialId">
-        <el-input
-          v-model="queryParams.orderMaterialId"
-          placeholder="请输入物料"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <!-- <el-form-item label="计划完工日期" prop="orderDeadline">
-        <el-date-picker clearable
-          v-model="queryParams.orderDeadline"
-          type="date"
-          value-format="yyyy-MM-dd"
-          style="width:100%;"
-          placeholder="请选择计划完工日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="开始生产日期" prop="orderStartDate">
-        <el-date-picker clearable
-          v-model="queryParams.orderStartDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          style="width:100%;"
-          placeholder="请选择开始生产日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="实际完工日期" prop="orderEndDate">
-        <el-date-picker clearable
-          v-model="queryParams.orderEndDate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          style="width:100%;"
-          placeholder="请选择实际完工日期">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="生产数量" prop="orderNumber">
-        <el-input
-          v-model="queryParams.orderNumber"
-          placeholder="请输入生产数量"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item> -->
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
+        </el-form-item> -->
+        <el-col :span="4">
+          <el-form-item label="状态" prop="orderStatus">
+            <el-select v-model="queryParams.orderStatus" placeholder="请选择状态" clearable>
+              <el-option
+                v-for="dict in dict.type.mes_order_status"
+                :key="dict.value"
+                :label="dict.label"
+                :value="dict.value"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="5">
+          <el-form-item label="物料" prop="orderMaterialId">
+            <el-input
+              v-model="queryParams.orderMaterialId"
+              placeholder="请输入物料"
+              clearable
+              @keyup.enter.native="handleQuery"
+            />
+          </el-form-item>
+        </el-col>
+          <!-- <el-form-item label="计划完工日期" prop="orderDeadline">
+          <el-date-picker clearable
+            v-model="queryParams.orderDeadline"
+            type="date"
+            value-format="yyyy-MM-dd"
+            style="width:100%;"
+            placeholder="请选择计划完工日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="开始生产日期" prop="orderStartDate">
+          <el-date-picker clearable
+            v-model="queryParams.orderStartDate"
+            type="date"
+            value-format="yyyy-MM-dd"
+            style="width:100%;"
+            placeholder="请选择开始生产日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="实际完工日期" prop="orderEndDate">
+          <el-date-picker clearable
+            v-model="queryParams.orderEndDate"
+            type="date"
+            value-format="yyyy-MM-dd"
+            style="width:100%;"
+            placeholder="请选择实际完工日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="生产数量" prop="orderNumber">
+          <el-input
+            v-model="queryParams.orderNumber"
+            placeholder="请输入生产数量"
+            clearable
+            @keyup.enter.native="handleQuery"
+          />
+        </el-form-item> -->
+        <el-col :span="5">
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
@@ -132,32 +144,38 @@
 
     <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="工单号" align="center" prop="orderId" />
-      <el-table-column label="批次号" align="center" prop="orderBatchId" />
-      <el-table-column label="创建人" align="center" prop="orderCreator" />
       <el-table-column label="状态" align="center" prop="orderStatus">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.mes_order_status" :value="scope.row.orderStatus"/>
         </template>
       </el-table-column>
-      <el-table-column label="物料" align="center" prop="orderMaterialId" />
-      <el-table-column label="计划完工日期" align="center" prop="orderDeadline" width="180">
+      <el-table-column label="工单号" align="center" prop="orderId" />
+      <el-table-column label="批次号" align="center" prop="orderBatchId" />
+      <!-- <el-table-column label="创建人" align="center" prop="orderCreator" /> -->
+      <el-table-column label="物料编号" align="center" prop="orderMaterialId" />
+      <el-table-column label="物料名称" align="center" prop="orderMaterialName" />
+      <el-table-column label="生产数量" align="center" prop="orderNumber" />
+      <el-table-column label="物料单位" align="center" prop="orderMaterialUnit">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.mes_unit" :value="scope.row.orderMaterialUnit"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="计划完工日期" align="center" prop="orderDeadline" width="100px">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderDeadline, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="开始生产日期" align="center" prop="orderStartDate" width="180">
+      <el-table-column label="开始生产日期" align="center" prop="orderStartDate" width="100px">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderStartDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="实际完工日期" align="center" prop="orderEndDate" width="180">
+      <el-table-column label="实际完工日期" align="center" prop="orderEndDate" width="100px">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderEndDate, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="生产数量" align="center" prop="orderNumber" />
-      <el-table-column label="创建时间" align="center" prop="orderCreateTime" width="180">
+      <el-table-column label="创建时间" align="center" prop="orderCreateTime" width="100px">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d}') }}</span>
         </template>
@@ -422,16 +440,24 @@
               <el-input v-model="scope.row.routeId" placeholder="请输入工序路线编号" />
             </template>
           </el-table-column> -->
-          <!-- <el-table-column label="工序编号" prop="processId" width="auto">
+          <el-table-column label="工序编号" prop="processId" width="auto">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.processId" placeholder="请输入工序编号" />
+              <!-- <el-input v-model="scope.row.processId" placeholder="请输入工序编号" /> -->
+              <el-select v-model="scope.row.processId" placeholder="工序" clearable :disabled="true">
+                  <el-option
+                    v-for="item in processList"
+                    :key="item.processId"
+                    :label="item.processName"
+                    :value="item.processId"
+                  />
+                </el-select>
             </template>
-          </el-table-column> -->
-          <el-table-column label="工序" prop="processName" width="auto">
+          </el-table-column>
+          <!-- <el-table-column label="工序" prop="processName" width="auto">
               <template slot-scope="scope">
                 <el-input v-model="scope.row.processName" placeholder="请输入工序编号" :disabled="true"/>
               </template>
-          </el-table-column>
+          </el-table-column> -->
           <!-- <el-table-column label="工序顺序" prop="processIndex" width="150">
             <template slot-scope="scope">
               <el-input v-model="scope.row.processIndex" placeholder="请输入工序顺序" />
@@ -442,7 +468,7 @@
               <el-select v-model="scope.row.stationId" placeholder="请选择工位" clearable @change="changeStation(scope)">
                 <el-option
                   v-for="item in stationList"
-                  :key="item.stationList"
+                  :key="item.stationId"
                   :label="item.stationName"
                   :value="item.stationId"
                 />
@@ -452,7 +478,15 @@
           
           <el-table-column label="车间编号" prop="workshopName" width="auto">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.workshopName" placeholder="请输入车间编号" :disabled="true"/>
+              <!-- <el-input v-model="scope.row.workshopName" placeholder="请输入车间编号" :disabled="true"/> -->
+              <el-select v-model="scope.row.workshopId" placeholder="请选择车间" clearable :disabled="true">
+                <el-option
+                  v-for="item in workshopList"
+                  :key="item.workshopId"
+                  :label="item.workshopName"
+                  :value="item.workshopId"
+                />
+              </el-select>
             </template>
           </el-table-column>
           <!-- <el-table-column label="完成数量" prop="orderFinishNumber" width="150">
@@ -476,6 +510,7 @@ import { listMaterial, getMaterial } from "@/api/mes/material";
 import { listRoute, getRoute } from "@/api/mes/route";
 import { listStation } from "@/api/mes/station";
 import { listWorkshop } from "@/api/mes/workshop";
+import { listProcess, getProcess } from "@/api/mes/process";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { listOrder, getOrder, delOrder, addOrder, updateOrder } from "@/api/mes/order";
@@ -528,8 +563,6 @@ export default {
       // 当前用户id
       userId: null,
 
-      // 工序与路线关系表格数据
-      routeProcessList: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -548,6 +581,8 @@ export default {
       orderList: [],
       // 工单工序表格数据
       orderRouteList: [],
+      // 工序列表
+      processList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -597,6 +632,7 @@ export default {
   },
   created() {
     this.getList();
+    this.getProcessList();
     this.getStationList();
     this.getWorkshopList();
     this.materialgetList();
@@ -605,6 +641,12 @@ export default {
     this.username = this.$store.state.user.name;
   },
   methods: {
+    /** 获取工序列表 */
+    getProcessList() {
+      listProcess({}).then(response => {
+        this.processList = response.rows;
+      });
+    },
     /** 获取车间列表 */
     getWorkshopList() {
       listWorkshop({}).then(response => {
@@ -759,9 +801,15 @@ export default {
       const orderId = row.orderId || this.ids
       getOrder(orderId).then(response => {
         this.form = response.data;
-        this.orderRouteList = response.data.orderRouteList;
         this.open = true;
+        this.orderRouteList = response.data.orderRouteList;
         this.title = "修改生产工单";
+        getItem(response.data.orderMaterialId).then(response => {
+          this.form.orderMaterialName = response.data.materialItemName;
+          this.form.orderMaterialId = response.data.materialItemId;
+          this.form.orderMaterialModel = response.data.materialItemModel;
+          this.form.orderMaterialUnit = response.data.materialItemUnit;
+        });
       });
     },
     /** 提交按钮 */
