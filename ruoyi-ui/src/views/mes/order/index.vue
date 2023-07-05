@@ -537,7 +537,7 @@ import { listWorkshop } from "@/api/mes/workshop";
 import { listProcess, getProcess } from "@/api/mes/process";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import { listOrder, getOrder, delOrder, addOrder, updateOrder, startOrder, changeOrderStatus } from "@/api/mes/order";
+import { listOrder, getOrder, delOrder, addOrder, updateOrder, changeOrderStatus } from "@/api/mes/order";
 
 export default {
   name: "Order",
@@ -859,12 +859,62 @@ export default {
     },
     /** 开始排产按钮操作 */
     handleStart(row) {
-      this.handleUpdateStatus(row, 1);
+      const orderIds = row.orderId || this.ids;
+      let count = 0;
+      for(let orderId of orderIds) {
+        getOrder(orderId).then(response => {
+          if(response.data.orderStatus == 1) {
+            this.$modal.msgError("工单编号为" + orderId + "的工单已开始排产，不能重复开始排产");
+            flag = false;
+            return;
+          } else if(response.data.orderStatus == 3) {
+            this.$modal.msgError("工单编号为" + orderId + "的工单已完工，不能开始排产");
+            flag = false;
+            return;
+          } else if(response.data.orderStatus == 4) {
+            this.$modal.msgError("工单编号为" + orderId + "的工单已强制关闭，不能开始排产");
+            flag = false;
+            return;
+          } else {
+            count++;
+            if(count == orderIds.length) {
+              this.handleUpdateStatus(row, 1);
+            }
+          }
+        });
+      }
     },
 
     /** 暂停排产按钮操作 */
     handlePause(row) {
-      this.handleUpdateStatus(row, 2);
+      const orderIds = row.orderId || this.ids;
+      let count = 0;
+      for(let orderId of orderIds) {
+        getOrder(orderId).then(response => {
+          if(response.data.orderStatus == 0) {
+            this.$modal.msgError("工单编号为" + orderId + "的工单未开始排产，不能暂停排产");
+            flag = false;
+            return;
+          } else if(response.data.orderStatus == 2) {
+            this.$modal.msgError("工单编号为" + orderId + "的工单已暂停排产，不能重复暂停排产");
+            flag = false;
+            return;
+          } else if (response.data.orderStatus == 3) {
+            this.$modal.msgError("工单编号为" + orderId + "的工单已完工，不能暂停排产");
+            flag = false;
+            return;
+          } else if(response.data.orderStatus == 4) {
+            this.$modal.msgError("工单编号为" + orderId + "的工单已强制关闭，不能暂停排产");
+            flag = false;
+            return;
+          } else {
+            count++;
+            if(count == orderIds.length) {
+              this.handleUpdateStatus(row, 2);
+            }
+          }
+        });
+      }
     },
 
     /** 强制关闭按钮操作 */
