@@ -925,12 +925,23 @@ export default {
     /** 修改工单状态按钮操作 */
     handleUpdateStatus(row, status) {
       const orderIds = row.orderId || this.ids;
-      this.$modal.confirm('是否确认修改工单编号为"' + orderIds + '"的数据项状态？').then(function() {
-        return changeOrderStatus(orderIds, status);
-      }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("修改状态成功");
-      }).catch(() => {});
+      if (status == 4) {
+        this.$modal.confirm('强制关闭操作会令工单编号为"' + orderIds + '"的工单(包括该工单的下的报工单等数据)失效,仍要强制关闭吗?').then(function() {
+          return changeOrderStatus(orderIds, status);
+        }).then(() => {
+          this.getList();
+          this.$modal.msgSuccess("强制关闭成功");
+        }).catch(() => {});
+      }
+      else {
+        this.$modal.confirm('是否确认修改工单编号为"' + orderIds + '"的数据项状态？').then(function () {
+          return changeOrderStatus(orderIds, status);
+        }).then(() => {
+          this.getList();
+          this.$modal.msgSuccess("修改状态成功");
+        }).catch(() => { });
+      }
+
     },
 
     /** 删除按钮操作 */

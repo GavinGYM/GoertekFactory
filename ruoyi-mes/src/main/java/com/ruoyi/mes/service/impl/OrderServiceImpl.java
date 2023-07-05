@@ -64,18 +64,20 @@ public class OrderServiceImpl implements IOrderService
     {
         List<Order> orderList = orderMapper.selectOrderList(order);
         for(Order order1 : orderList){
-//            List<OrderRoute> orderRouteList = order1.getOrderRouteList();
-//            if(orderRouteList!=null) {
-//                for(OrderRoute orderRoute : orderRouteList){
-//                    orderRoute.setProcessName(processMapper.selectProcessByProcessId(orderRoute.getProcessId()).getProcessName());
-//                    orderRoute.setWorkshopName(workshopMapper.selectWorkshopByWorkshopId(orderRoute.getWorkshopId()).getWorkshopName());
-//                }
-//            }
-//            order1.setOrderRouteList(orderRouteList);
             MaterialItem materialItem = materialItemMapper.selectMaterialItemByMaterialItemId(order1.getOrderMaterialId());
             order1.setOrderMaterialName(materialItem.getMaterialItemName());
             order1.setOrderMaterialUnit(materialItem.getMaterialItemUnit());
         }
+        // 对OrderList根据工单状态进行排序
+        orderList.sort((o1, o2) -> {
+            if(o1.getOrderStatus() > o2.getOrderStatus()){
+                return 1;
+            }else if(o1.getOrderStatus() < o2.getOrderStatus()){
+                return -1;
+            }else{
+                return 0;
+            }
+        });
         return orderList;
     }
 
