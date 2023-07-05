@@ -92,6 +92,17 @@ public class OrderController extends BaseController
     }
 
     /**
+     * 修改工单状态
+     */
+    @PreAuthorize("@ss.hasPermi('mes:order:edit')")
+    @Log(title = "修改工单状态", businessType = BusinessType.UPDATE)
+    @PutMapping("/changestatus/{orderIds}/{status}")
+    public AjaxResult changeStatus(@PathVariable Long[] orderIds, @PathVariable Long status)
+    {
+        return toAjax(orderService.changeStatusByOrderIds(orderIds, status));
+    }
+
+    /**
      * 删除生产工单
      */
     @PreAuthorize("@ss.hasPermi('mes:order:remove')")

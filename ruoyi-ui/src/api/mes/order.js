@@ -35,6 +35,14 @@ export function updateOrder(data) {
   })
 }
 
+// 修改工单状态
+export function changeOrderStatus(orderId, status) {
+  return request({
+    url: '/mes/order/changestatus/' + orderId + '/' + status,
+    method: 'put'
+  })
+}
+
 // 删除生产工单
 export function delOrder(orderId) {
   return request({

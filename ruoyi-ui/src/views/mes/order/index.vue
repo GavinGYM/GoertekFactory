@@ -110,6 +110,30 @@
       <el-col :span="1.5">
         <el-button
           type="success"
+          size="mini"
+          :disabled="multiple"
+          @click="handleStart"
+        >开始排产</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          size="mini"
+          :disabled="multiple"
+          @click="handlePause"
+        >工单暂停</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          size="mini"
+          :disabled="multiple"
+          @click="handleStop"
+        >强制关闭</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
           plain
           icon="el-icon-edit"
           size="mini"
@@ -513,7 +537,7 @@ import { listWorkshop } from "@/api/mes/workshop";
 import { listProcess, getProcess } from "@/api/mes/process";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
-import { listOrder, getOrder, delOrder, addOrder, updateOrder } from "@/api/mes/order";
+import { listOrder, getOrder, delOrder, addOrder, updateOrder, startOrder, changeOrderStatus } from "@/api/mes/order";
 
 export default {
   name: "Order",
@@ -598,7 +622,7 @@ export default {
         orderId: null,
         orderBatchId: null,
         orderCreator: null,
-        orderStatus: 0,
+        orderStatus: null,
         orderMaterialId: null,
         orderDeadline: null,
         orderStartDate: null,
@@ -756,7 +780,7 @@ export default {
         orderId: null,
         orderBatchId: null,
         orderCreator: null,
-        orderStatus: 0,
+        orderStatus: null,
         orderMaterialId: null,
         orderDeadline: null,
         orderStartDate: null,
@@ -833,6 +857,32 @@ export default {
         }
       });
     },
+    /** 开始排产按钮操作 */
+    handleStart(row) {
+      this.handleUpdateStatus(row, 1);
+    },
+
+    /** 暂停排产按钮操作 */
+    handlePause(row) {
+      this.handleUpdateStatus(row, 2);
+    },
+
+    /** 强制关闭按钮操作 */
+    handleStop(row) {
+      this.handleUpdateStatus(row, 4);
+    },
+
+    /** 修改工单状态按钮操作 */
+    handleUpdateStatus(row, status) {
+      const orderIds = row.orderId || this.ids;
+      this.$modal.confirm('是否确认修改工单编号为"' + orderIds + '"的数据项状态？').then(function() {
+        return changeOrderStatus(orderIds, status);
+      }).then(() => {
+        this.getList();
+        this.$modal.msgSuccess("修改状态成功");
+      }).catch(() => {});
+    },
+
     /** 删除按钮操作 */
     handleDelete(row) {
       const orderIds = row.orderId || this.ids;

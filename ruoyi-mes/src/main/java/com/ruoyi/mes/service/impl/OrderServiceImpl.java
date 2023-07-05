@@ -112,6 +112,28 @@ public class OrderServiceImpl implements IOrderService
     }
 
     /**
+     * 批量修改工单状态
+     *
+     * @param orderIds 需要修改状态的生产工单主键
+     * @return 结果
+     */
+    @Transactional
+    @Override
+    public int changeStatusByOrderIds(Long[] orderIds, Long orderStatus)
+    {
+        int result = 0;
+        for (Long orderId : orderIds) {
+            Order order = orderMapper.selectOrderByOrderId(orderId);
+            order.setOrderStatus(orderStatus);
+            if(orderStatus == 1L && order.getOrderStartDate() == null){
+                order.setOrderStartDate(new java.util.Date());
+            }
+            result += orderMapper.updateOrder(order);
+        }
+        return result;
+    }
+
+    /**
      * 批量删除生产工单
      * 
      * @param orderIds 需要删除的生产工单主键

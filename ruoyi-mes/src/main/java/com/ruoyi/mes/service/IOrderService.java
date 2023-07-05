@@ -58,4 +58,6 @@ public interface IOrderService
      * @return 结果
      */
     public int deleteOrderByOrderId(Long orderId);
+
+    public int changeStatusByOrderIds(Long[] orderIds, Long status);
 }
