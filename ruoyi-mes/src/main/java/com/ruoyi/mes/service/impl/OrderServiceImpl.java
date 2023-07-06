@@ -186,4 +186,15 @@ public class OrderServiceImpl implements IOrderService
             }
         }
     }
+
+    /**
+     * 更新工单工序信息
+     *
+     * @param orderRoute 工单工序对象
+     * @return 结果
+     */
+    public int updateOrderRoute(OrderRoute orderRoute)
+    {
+        return orderMapper.updateOrderRoute(orderRoute);
+    }
 }

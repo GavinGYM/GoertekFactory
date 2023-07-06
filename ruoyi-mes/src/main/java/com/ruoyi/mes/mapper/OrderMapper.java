@@ -45,6 +45,14 @@ public interface OrderMapper
     public int updateOrder(Order order);
 
     /**
+     * 修改工单工序信息
+     *
+     * @param orderRoute 工单工序对象
+     * @return 结果
+     */
+    public int updateOrderRoute(OrderRoute orderRoute);
+
+    /**
      * 删除生产工单
      * 
      * @param orderId 生产工单主键

@@ -110,6 +110,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{orderId}
         </foreach>
     </delete>
+
+    <update id="updateOrderRoute" parameterType="OrderRoute">
+        update mes_order_route
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderFinishNumber != null">order_finish_number = #{orderFinishNumber},</if>
+        </trim>
+--  这里的条件是根据order_id和process_index来进行联合判断，因为主键是这两个值，根据这两个值可以唯一确定一条数据。
+        where order_id = #{orderId} and process_index = #{processIndex}
+    </update>
     
     <delete id="deleteOrderRouteByOrderIds" parameterType="String">
         delete from mes_order_route where order_id in 

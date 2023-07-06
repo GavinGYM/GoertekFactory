@@ -2,6 +2,7 @@ package com.ruoyi.mes.service;
 
 import java.util.List;
 import com.ruoyi.mes.domain.Order;
+import com.ruoyi.mes.domain.OrderRoute;
 
 /**
  * 生产工单Service接口
@@ -60,4 +61,12 @@ public interface IOrderService
     public int deleteOrderByOrderId(Long orderId);
 
     public int changeStatusByOrderIds(Long[] orderIds, Long status);
+
+    /**
+     * 更新工单工序信息
+     *
+     * @param orderRoute 工单工序对象
+     * @return 结果
+     */
+    public int updateOrderRoute(OrderRoute orderRoute);
 }

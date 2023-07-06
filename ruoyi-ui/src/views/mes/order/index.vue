@@ -332,15 +332,7 @@
           </el-row>
 
           <el-divider content-position="center">请选择工序进行报工</el-divider>
-          <!-- <el-row :gutter="10" class="mb8">
-          <el-col :span="1.5">
-            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddOrderRoute">添加</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDeleteOrderRoute">删除</el-button>
-          </el-col>
-        </el-row> -->
-          <el-table :data="orderRouteList" :row-class-name="rowOrderRouteIndex" @selection-change="handleOrderRouteSelectionChange" ref="orderRoute">
+          <el-table :data="orderRouteList" :row-class-name="rowOrderRouteIndex" ref="orderRoute">
             <!-- <el-table-column type="selection" width="50" align="center" /> -->
             <el-table-column label="序号" align="center" prop="processIndex" width="50">
               <template slot-scope="scope">
@@ -1231,6 +1223,7 @@ export default {
     },
     /** 报工填报按钮操作 */
     handleReportOrderRoute(row) {
+      this.reportOpen = false;
       this.reportDetailopen = true;
       this.reportInfoList = row;
     },
