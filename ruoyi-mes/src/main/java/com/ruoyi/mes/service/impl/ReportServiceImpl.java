@@ -93,22 +93,12 @@ public class ReportServiceImpl implements IReportService
     {
         int result = reportMapper.insertReport(report);
         if(result > 0){
-            // 查询当前工序的所有报工
-            Report searchReport = new Report();
-            searchReport.setOrderId(report.getOrderId());
-            searchReport.setProcessIndex(report.getProcessIndex());
-            List<Report> reportList = reportMapper.selectReportList(searchReport);
-            // 计算总报工数
-            Long totalNumber = 0L;
-            for(Report r : reportList){
-                totalNumber += r.getReportNumber();
-            }
             // 更新当前工序的总报工数
             Order order = orderMapper.selectOrderByOrderId(report.getOrderId());
             List<OrderRoute> orderRouteList = order.getOrderRouteList();
             for(OrderRoute orderRoute : orderRouteList){
                 if(orderRoute.getRouteId().equals(report.getRouteId()) && orderRoute.getProcessIndex().equals(report.getProcessIndex())){
-                    orderRoute.setOrderFinishNumber(totalNumber);
+                    orderRoute.setOrderFinishNumber(orderRoute.getOrderFinishNumber() + report.getReportNumber());
                     break;
                 }
             }
@@ -157,6 +147,42 @@ public class ReportServiceImpl implements IReportService
     @Override
     public int deleteReportByReportIds(Long[] reportIds)
     {
+        if(reportIds.length > 0){
+            for(Long reportId : reportIds){
+                // 获得当前要处理的报工条目
+                Report report = reportMapper.selectReportByReportId(reportId);
+                // 更新当前工序的总报工数
+                Order order = orderMapper.selectOrderByOrderId(report.getOrderId());
+                List<OrderRoute> orderRouteList = order.getOrderRouteList();
+                for(OrderRoute orderRoute : orderRouteList){
+                    if(orderRoute.getRouteId().equals(report.getRouteId()) && orderRoute.getProcessIndex().equals(report.getProcessIndex())){
+                        orderRoute.setOrderFinishNumber(orderRoute.getOrderFinishNumber() - report.getReportNumber());
+                        break;
+                    }
+                }
+                order.setOrderRouteList(orderRouteList);
+
+                // 查询订单的目标产量
+                Long targetNumber = order.getOrderNumber();
+                // 查询订单所有工序的已报工数量
+                boolean flag = true;
+                for(OrderRoute orderRoute1 : orderRouteList){
+                    if (orderRoute1.getOrderFinishNumber() == null || orderRoute1.getOrderFinishNumber() < targetNumber){
+                        flag = false;
+                        break;
+                    }
+                }
+                // 如果有工序的已报工数量小于目标产量，则订单状态改为生产中
+                if(!flag){
+                    order.setOrderStatus(1L);
+                    order.setOrderEndDate(new Date(0, 1, 1));
+                }
+
+                // 最后更新订单
+                orderService.updateOrder(order);
+            }
+        }
+
         return reportMapper.deleteReportByReportIds(reportIds);
     }
 
