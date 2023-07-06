@@ -28,9 +28,17 @@ public class Report extends BaseEntity
     @Excel(name = "工序路线号")
     private Long routeId;
 
+    /** 工序路线名 */
+    @Excel(name = "工序路线名")
+    private String routeName;
+
     /** 工序号 */
     @Excel(name = "工序号")
     private Long processId;
+
+    /** 工序名 */
+    @Excel(name = "工序名")
+    private String processName;
 
     /** 工序排序 */
     @Excel(name = "工序排序")
@@ -39,6 +47,10 @@ public class Report extends BaseEntity
     /** 报工人id */
     @Excel(name = "报工人id")
     private Long userId;
+
+    /** 报工人名称 */
+    @Excel(name = "报工人名称")
+    private String userName;
 
     /** 报工时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -53,9 +65,17 @@ public class Report extends BaseEntity
     @Excel(name = "车间id")
     private Long workshopId;
 
+    /** 车间名称 */
+    @Excel(name = "车间名称")
+    private String workshopName;
+
     /** 工位id */
     @Excel(name = "工位id")
     private Long stationId;
+
+    /** 工位名称 */
+    @Excel(name = "工位名称")
+    private String stationName;
 
     public void setReportId(Long reportId) 
     {
@@ -84,6 +104,16 @@ public class Report extends BaseEntity
     {
         return routeId;
     }
+
+    public void setRouteName(String routeName)
+    {
+        this.routeName = routeName;
+    }
+
+    public String getRouteName()
+    {
+        return routeName;
+    }
     public void setProcessId(Long processId) 
     {
         this.processId = processId;
@@ -92,6 +122,16 @@ public class Report extends BaseEntity
     public Long getProcessId() 
     {
         return processId;
+    }
+
+    public void setProcessName(String processName)
+    {
+        this.processName = processName;
+    }
+
+    public String getProcessName()
+    {
+        return processName;
     }
     public void setProcessIndex(Long processIndex) 
     {
@@ -110,6 +150,16 @@ public class Report extends BaseEntity
     public Long getUserId() 
     {
         return userId;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
+    }
+
+    public String getUserName()
+    {
+        return userName;
     }
     public void setReportTime(Date reportTime) 
     {
@@ -138,6 +188,17 @@ public class Report extends BaseEntity
     {
         return workshopId;
     }
+
+    public void setWorkshopName(String workshopName)
+    {
+        this.workshopName = workshopName;
+    }
+
+    public String getWorkshopName()
+    {
+        return workshopName;
+    }
+
     public void setStationId(Long stationId) 
     {
         this.stationId = stationId;
@@ -146,6 +207,16 @@ public class Report extends BaseEntity
     public Long getStationId() 
     {
         return stationId;
+    }
+
+    public void setStationName(String stationName)
+    {
+        this.stationName = stationName;
+    }
+
+    public String getStationName()
+    {
+        return stationName;
     }
 
     @Override
@@ -161,6 +232,11 @@ public class Report extends BaseEntity
             .append("reportNumber", getReportNumber())
             .append("workshopId", getWorkshopId())
             .append("stationId", getStationId())
+            .append("routeName", getRouteName())
+            .append("processName", getProcessName())
+            .append("userName", getUserName())
+            .append("workshopName", getWorkshopName())
+            .append("stationName", getStationName())
             .toString();
     }
 }

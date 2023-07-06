@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="生产工单号" prop="orderId">
+      <el-form-item label="生产工单" prop="orderId">
         <el-input
           v-model="queryParams.orderId"
           placeholder="请输入生产工单号"
@@ -9,7 +9,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="工序路线号" prop="routeId">
+      <!-- <el-form-item label="工序路线" prop="routeId">
         <el-input
           v-model="queryParams.routeId"
           placeholder="请输入工序路线号"
@@ -24,7 +24,7 @@
           clearable
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="工序排序" prop="processIndex">
         <el-input
           v-model="queryParams.processIndex"
@@ -80,7 +80,7 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
+      <!-- <el-col :span="1.5">
         <el-button
           type="primary"
           plain
@@ -100,7 +100,7 @@
           @click="handleUpdate"
           v-hasPermi="['mes:report:edit']"
         >修改</el-button>
-      </el-col>
+      </el-col> -->
       <el-col :span="1.5">
         <el-button
           type="danger"
@@ -127,21 +127,25 @@
 
     <el-table v-loading="loading" :data="reportList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="报工号" align="center" prop="reportId" />
-      <el-table-column label="生产工单号" align="center" prop="orderId" />
-      <el-table-column label="工序路线号" align="center" prop="routeId" />
-      <el-table-column label="工序号" align="center" prop="processId" />
-      <el-table-column label="工序排序" align="center" prop="processIndex" />
-      <el-table-column label="报工人id" align="center" prop="userId" />
+      <!-- <el-table-column label="报工号" align="center" prop="reportId" /> -->
+      <el-table-column label="工单号" align="center" prop="orderId" width="80" />
+      <el-table-column label="工序路线" align="center" prop="routeName" width="auto" />
+      <el-table-column label="工序号" align="center" prop="processName" />
+      <el-table-column label="工序排序" align="center" prop="processIndex">
+        <template slot-scope="scope">
+          <span>第{{ scope.row.processIndex }}道工序</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="报工人" align="center" prop="userName" />
+      <el-table-column label="报工数量" align="center" prop="reportNumber" />
+      <el-table-column label="车间" align="center" prop="workshopName" width="150" />
+      <el-table-column label="工位" align="center" prop="stationName" />
       <el-table-column label="报工时间" align="center" prop="reportTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.reportTime, '{y}-{m}-{d}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="报工数量" align="center" prop="reportNumber" />
-      <el-table-column label="车间id" align="center" prop="workshopId" />
-      <el-table-column label="工位id" align="center" prop="stationId" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <!-- <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -158,7 +162,7 @@
             v-hasPermi="['mes:report:remove']"
           >删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     
     <pagination

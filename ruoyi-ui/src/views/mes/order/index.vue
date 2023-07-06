@@ -336,7 +336,7 @@
             <!-- <el-table-column type="selection" width="50" align="center" /> -->
             <el-table-column label="序号" align="center" prop="processIndex" width="50">
               <template slot-scope="scope">
-                <span>{{ scope.row.processIndex + 1 }}</span>
+                <span>{{ scope.row.processIndex }}</span>
               </template>
             </el-table-column>
             <!-- <el-table-column label="工序路线编号" prop="routeId" width="150">
@@ -521,7 +521,7 @@
           </el-col>
           <el-col :span="8">
             <el-form-item label="工序顺序" prop="processName" >
-              <span>第{{ reportInfoList.processIndex + 1 }}道工序</span>
+              <span>第{{ reportInfoList.processIndex }}道工序</span>
             </el-form-item>
           </el-col>
         </el-row>
@@ -1090,7 +1090,7 @@ export default {
     getRouteProcessList(routeId) {
       getRoute(routeId).then(response => {
         // this.routeProcessList = response.data.routeProcessList;
-        this.orderRouteList = response.data.routeProcessList;
+        this.orderRouteList = response.data.routeProcessList.slice(1);
       });
     },
     /** 查询工序路线列表 */
@@ -1235,6 +1235,7 @@ export default {
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
+      this.form.orderStatus = 0;
       this.open = true;
       this.title = "添加生产工单";
     },

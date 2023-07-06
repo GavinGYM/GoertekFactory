@@ -1,14 +1,15 @@
 package com.ruoyi.mes.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import com.ruoyi.mes.domain.Order;
 import com.ruoyi.mes.domain.OrderRoute;
-import com.ruoyi.mes.mapper.OrderMapper;
+import com.ruoyi.mes.mapper.*;
 import com.ruoyi.mes.service.IOrderService;
+import com.ruoyi.system.mapper.SysUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.mes.mapper.ReportMapper;
 import com.ruoyi.mes.domain.Report;
 import com.ruoyi.mes.service.IReportService;
 
@@ -26,6 +27,21 @@ public class ReportServiceImpl implements IReportService
 
     @Autowired
     private OrderMapper orderMapper;
+
+    @Autowired
+    private RouteMapper routeMapper;
+
+    @Autowired
+    private SysUserMapper userMapper;
+
+    @Autowired
+    private WorkshopMapper workshopMapper;
+
+    @Autowired
+    private StationMapper stationMapper;
+
+    @Autowired
+    private ProcessMapper processMapper;
 
     @Autowired
     private IOrderService orderService;
@@ -51,7 +67,19 @@ public class ReportServiceImpl implements IReportService
     @Override
     public List<Report> selectReportList(Report report)
     {
-        return reportMapper.selectReportList(report);
+        List<Report> reportList = reportMapper.selectReportList(report);
+        for(Report r : reportList){
+            r.setRouteName(routeMapper.selectRouteByRouteId(r.getRouteId()).getRouteName());
+            r.setProcessName(processMapper.selectProcessByProcessId(r.getProcessId()).getProcessName());
+            if(r.getUserId() != null){
+                r.setUserName(userMapper.selectUserById(r.getUserId()).getNickName());
+            }else{
+                r.setUserName("未知");
+            }
+            r.setWorkshopName(workshopMapper.selectWorkshopByWorkshopId(r.getWorkshopId()).getWorkshopName());
+            r.setStationName(stationMapper.selectStationByStationId(r.getStationId()).getStationName());
+        }
+        return reportList;
     }
 
     /**
@@ -99,6 +127,7 @@ public class ReportServiceImpl implements IReportService
             // 如果所有工序的已报工数量都大于等于目标产量，则订单状态改为已完成
             if(flag){
                 order.setOrderStatus(3L);
+                order.setOrderEndDate(new Date());
             }
 
             // 最后更新订单
