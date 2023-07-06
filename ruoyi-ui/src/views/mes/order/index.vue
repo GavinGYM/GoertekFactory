@@ -1155,6 +1155,7 @@ export default {
           this.reportForm.processId = this.reportInfoList.processId;
           this.reportForm.stationId = this.reportInfoList.stationId;
           this.reportForm.workshopId = this.reportInfoList.workshopId;
+          this.reportForm.processIndex = this.reportInfoList.processIndex;
           addReport(this.reportForm).then(response => {
             this.$modal.msgSuccess("新增成功");
             this.reportDetailopen = false;

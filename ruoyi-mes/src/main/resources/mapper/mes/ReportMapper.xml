@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mes.mapper.ReportMapper">
+    
+    <resultMap type="Report" id="ReportResult">
+        <result property="reportId"    column="report_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="routeId"    column="route_id"    />
+        <result property="processId"    column="process_id"    />
+        <result property="processIndex"    column="process_index"    />
+        <result property="userId"    column="user_id"    />
+        <result property="reportTime"    column="report_time"    />
+        <result property="reportNumber"    column="report_number"    />
+        <result property="workshopId"    column="workshop_id"    />
+        <result property="stationId"    column="station_id"    />
+    </resultMap>
+
+    <sql id="selectReportVo">
+        select report_id, order_id, route_id, process_id, process_index, user_id, report_time, report_number, workshop_id, station_id from mes_report
+    </sql>
+
+    <select id="selectReportList" parameterType="Report" resultMap="ReportResult">
+        <include refid="selectReportVo"/>
+        <where>  
+            <if test="orderId != null "> and order_id = #{orderId}</if>
+            <if test="routeId != null "> and route_id = #{routeId}</if>
+            <if test="processId != null "> and process_id = #{processId}</if>
+            <if test="processIndex != null "> and process_index = #{processIndex}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="reportTime != null "> and report_time = #{reportTime}</if>
+            <if test="reportNumber != null "> and report_number = #{reportNumber}</if>
+            <if test="workshopId != null "> and workshop_id = #{workshopId}</if>
+            <if test="stationId != null "> and station_id = #{stationId}</if>
+        </where>
+    </select>
+    
+    <select id="selectReportByReportId" parameterType="Long" resultMap="ReportResult">
+        <include refid="selectReportVo"/>
+        where report_id = #{reportId}
+    </select>
+        
+    <insert id="insertReport" parameterType="Report">
+        insert into mes_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">report_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="routeId != null">route_id,</if>
+            <if test="processId != null">process_id,</if>
+            <if test="processIndex != null">process_index,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="reportTime != null">report_time,</if>
+            <if test="reportNumber != null">report_number,</if>
+            <if test="workshopId != null">workshop_id,</if>
+            <if test="stationId != null">station_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reportId != null">#{reportId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="routeId != null">#{routeId},</if>
+            <if test="processId != null">#{processId},</if>
+            <if test="processIndex != null">#{processIndex},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="reportTime != null">#{reportTime},</if>
+            <if test="reportNumber != null">#{reportNumber},</if>
+            <if test="workshopId != null">#{workshopId},</if>
+            <if test="stationId != null">#{stationId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateReport" parameterType="Report">
+        update mes_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="routeId != null">route_id = #{routeId},</if>
+            <if test="processId != null">process_id = #{processId},</if>
+            <if test="processIndex != null">process_index = #{processIndex},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="reportTime != null">report_time = #{reportTime},</if>
+            <if test="reportNumber != null">report_number = #{reportNumber},</if>
+            <if test="workshopId != null">workshop_id = #{workshopId},</if>
+            <if test="stationId != null">station_id = #{stationId},</if>
+        </trim>
+        where report_id = #{reportId}
+    </update>
+
+    <delete id="deleteReportByReportId" parameterType="Long">
+        delete from mes_report where report_id = #{reportId}
+    </delete>
+
+    <delete id="deleteReportByReportIds" parameterType="String">
+        delete from mes_report where report_id in 
+        <foreach item="reportId" collection="array" open="(" separator="," close=")">
+            #{reportId}
+        </foreach>
+    </delete>
+</mapper>
