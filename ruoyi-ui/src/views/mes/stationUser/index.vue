@@ -146,7 +146,7 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px" input-width="200px">
         <el-form-item label="车间" prop="workshopName">
-          <el-input v-model="workshopName" :disabled="true" width = "80px"/>
+          <el-input v-model="form.workshopName" :disabled="true" width = "80px"/>
         </el-form-item>
 
         <el-form-item label="工位" prop="stationId">
@@ -162,7 +162,7 @@
         </el-form-item>
 
         <el-form-item label="用户名" prop="userName">
-          <el-input v-model="userName" :disabled="true"/>
+          <el-input v-model="form.userName" :disabled="true"/>
         </el-form-item>
 
         <el-form-item label="用户昵称" prop="userId">
@@ -195,12 +195,6 @@ export default {
   name: "StationUser",
   data() {
     return {
-      // 用户名
-      userName: null,
-      // 当前车间
-      workshopId: null,
-      // 当前车间名称
-      workshopName: null,
       // 工位列表
       stationList: [],
       // 用户列表
@@ -252,16 +246,16 @@ export default {
     changeUser(val) {
       for(let user of this.userList) {
         if(user.userId === val) {
-          this.userName = user.userName;
+          this.form.userName = user.userName;
         }
       }
     },
     /** 当所选工位发生变更时 */
     changeStation(val) {
-      this.workshopId = this.stationList.find(item => item.stationId === val).workshopId;
+      this.form.workshopId = this.stationList.find(item => item.stationId === val).workshopId;
       for (let workshop of this.workshopList) {
-        if (workshop.workshopId === this.workshopId) {
-          this.workshopName = workshop.workshopName;
+        if (workshop.workshopId === this.form.workshopId) {
+          this.form.workshopName = workshop.workshopName;
         }
       }
     },  
@@ -304,7 +298,13 @@ export default {
         stationId: null,
         userId: null,
         addUserId: null,
-        addTime: null
+        addTime: null,
+        // 用户名
+        userName: null, 
+        // 当前车间
+        workshopId: null,
+        // 当前车间名称
+        workshopName: null,
       };
       this.resetForm("form");
     },
@@ -336,6 +336,8 @@ export default {
       const stationUserId = row.stationUserId || this.ids
       getStationUser(stationUserId).then(response => {
         this.form = response.data;
+        this.changeUser(response.data.userId);
+        this.changeStation(response.data.stationId);
         this.open = true;
         this.title = "修改工位绑定";
       });
