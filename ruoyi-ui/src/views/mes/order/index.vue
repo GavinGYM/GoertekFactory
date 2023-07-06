@@ -168,6 +168,18 @@
 
     <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+      <!-- <el-table-column label="展开" align="center" prop="unfold" type="expand" >
+      </el-table-column> -->
+      <el-table-column label="报工" align="center" width="60">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-s-claim"
+            @click="handleReport(scope.row)"
+          >报工</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center" prop="orderStatus">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.mes_order_status" :value="scope.row.orderStatus"/>
@@ -231,6 +243,338 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+    <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 报工弹出层 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ -->
+      <el-dialog :title="reportTitle" :visible.sync="reportOpen" width="900px" append-to-body>
+        <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+          <el-row>
+            <el-col :span="8">
+              <el-form-item label="批次号" prop="orderBatchId">
+                <!-- <el-input v-model="form.orderBatchId" placeholder="请输入批次号" :disabled="true" /> -->
+                <span>{{ form.orderBatchId }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="物料" prop="orderMaterialName">
+                <!-- <el-input v-model="form.orderMaterialName" placeholder="请输入物料" :disabled="true"> -->
+                <span>{{ form.orderMaterialName }}</span>
+                </el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="物料编号" prop="orderMaterialId">
+                <!-- <el-input v-model="form.orderMaterialId" placeholder="请输入物料编号" :disabled="true" /> -->
+                <span>{{ form.orderMaterialId }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="规格型号" prop="orderMaterialModel">
+                <!-- <el-input v-model="form.orderMaterialModel" placeholder="请输入规格型号" :disabled="true" /> -->
+                <span>{{ form.orderMaterialModel }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="生产数量" prop="orderNumber">
+                <!-- <el-input v-model="form.orderNumber" placeholder="请输入生产数量" :disabled="true" /> -->
+                <span>{{ form.orderNumber }}</span>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="计量单位" prop="orderMaterialUnit">
+                <el-select v-model="form.orderMaterialUnit" placeholder="请选择计量单位" :disabled="true">
+                  <el-option
+                    v-for="dict in dict.type.mes_unit"
+                    :key="dict.value"
+                    :label="dict.label"
+                    :value="parseInt(dict.value)"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="8">
+              <el-form-item label="计划完工" prop="orderDeadline" >
+                <el-date-picker clearable
+                  v-model="form.orderDeadline"
+                  type="date"
+                  value-format="yyyy-MM-dd"
+                  style="width:100%;"
+                  :disabled="true"
+                  placeholder="请选择计划完工日期">
+                </el-date-picker>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="开始生产" prop="orderStartDate" >
+                <el-date-picker clearable
+                  v-model="form.orderStartDate"
+                  type="date"
+                  value-format="yyyy-MM-dd"
+                  style="width:100%;"
+                  :disabled="true"
+                  placeholder="暂未开始生产">
+                </el-date-picker>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="实际完工" prop="orderEndDate" >
+                <el-date-picker clearable
+                  v-model="form.orderEndDate"
+                  type="date"
+                  value-format="yyyy-MM-dd"
+                  style="width:100%;"
+                  :disabled="true"
+                  placeholder="暂未完工">
+                </el-date-picker>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-divider content-position="center">请选择工序进行报工</el-divider>
+          <!-- <el-row :gutter="10" class="mb8">
+          <el-col :span="1.5">
+            <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAddOrderRoute">添加</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDeleteOrderRoute">删除</el-button>
+          </el-col>
+        </el-row> -->
+          <el-table :data="orderRouteList" :row-class-name="rowOrderRouteIndex" @selection-change="handleOrderRouteSelectionChange" ref="orderRoute">
+            <!-- <el-table-column type="selection" width="50" align="center" /> -->
+            <el-table-column label="序号" align="center" prop="processIndex" width="50">
+              <template slot-scope="scope">
+                <span>{{ scope.row.processIndex + 1 }}</span>
+              </template>
+            </el-table-column>
+            <!-- <el-table-column label="工序路线编号" prop="routeId" width="150">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.routeId" placeholder="请输入工序路线编号" />
+            </template>
+          </el-table-column> -->
+            <el-table-column label="工序编号" align="center" prop="processId" width="auto">
+              <template slot-scope="scope">
+                <!-- <el-input v-model="scope.row.processId" placeholder="请输入工序编号" /> -->
+                <el-select v-model="scope.row.processId" placeholder="工序" clearable :disabled="true">
+                    <el-option
+                      v-for="item in processList"
+                      :key="item.processId"
+                      :label="item.processName"
+                      :value="item.processId"
+                    />
+                  </el-select>
+              </template>
+            </el-table-column>
+            <!-- <el-table-column label="工序" prop="processName" width="auto">
+              <template slot-scope="scope">
+                <el-input v-model="scope.row.processName" placeholder="请输入工序编号" :disabled="true"/>
+              </template>
+          </el-table-column> -->
+            <!-- <el-table-column label="工序顺序" prop="processIndex" width="150">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.processIndex" placeholder="请输入工序顺序" />
+            </template>
+          </el-table-column> -->
+            <el-table-column label="工位" align="center" prop="stationId" width="auto">
+              <template slot-scope="scope">
+                <el-select v-model="scope.row.stationId" placeholder="请选择工位" clearable :disabled="true">
+                  <el-option
+                    v-for="item in stationList"
+                    :key="item.stationId"
+                    :label="item.stationName"
+                    :value="item.stationId"
+                  />
+                </el-select>
+              </template>
+            </el-table-column>
+          
+            <el-table-column label="车间编号" align="center" prop="workshopName" width="auto">
+              <template slot-scope="scope">
+                <!-- <el-input v-model="scope.row.workshopName" placeholder="请输入车间编号" :disabled="true"/> -->
+                <el-select v-model="scope.row.workshopId" placeholder="请选择车间" clearable :disabled="true">
+                  <el-option
+                    v-for="item in workshopList"
+                    :key="item.workshopId"
+                    :label="item.workshopName"
+                    :value="item.workshopId"
+                  />
+                </el-select>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="已报工数量" align="center" prop="reportNumber" width="auto">
+              <template slot-scope="scope">
+                <span> {{ scope.row.orderFinishNumber }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="报工" align="center" prop="reportButton" width="100px">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  type="primary"
+                  plain
+                  icon="el-icon-s-claim"
+                  @click="handleReportOrderRoute(scope.row)"
+                >报工</el-button>
+              </template>
+            </el-table-column>
+
+          </el-table>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <!-- <el-button type="primary" @click="submitForm">确 定</el-button> -->
+          <el-button @click="reportCancel">返回</el-button>
+        </div>
+      </el-dialog>
+    <!-- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 报工弹出层 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ -->
+
+    <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 报工填报层 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ -->
+    <el-dialog :title="reportDetailTitle" :visible.sync="reportDetailopen" width="800px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="批次号" prop="orderBatchId">
+              <!-- <el-input v-model="form.orderBatchId" placeholder="请输入批次号" :disabled="true" /> -->
+              <span>{{ form.orderBatchId }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="物料" prop="orderMaterialName">
+              <!-- <el-input v-model="form.orderMaterialName" placeholder="请输入物料" :disabled="true"> -->
+              <span>{{ form.orderMaterialName }}</span>
+              </el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="物料编号" prop="orderMaterialId">
+              <!-- <el-input v-model="form.orderMaterialId" placeholder="请输入物料编号" :disabled="true" /> -->
+              <span>{{ form.orderMaterialId }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="规格型号" prop="orderMaterialModel">
+              <!-- <el-input v-model="form.orderMaterialModel" placeholder="请输入规格型号" :disabled="true" /> -->
+              <span>{{ form.orderMaterialModel }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="生产数量" prop="orderNumber">
+              <!-- <el-input v-model="form.orderNumber" placeholder="请输入生产数量" :disabled="true" /> -->
+              <span>{{ form.orderNumber }}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="计量单位" prop="orderMaterialUnit">
+              <el-select v-model="form.orderMaterialUnit" placeholder="请选择计量单位" :disabled="true">
+                <el-option
+                  v-for="dict in dict.type.mes_unit"
+                  :key="dict.value"
+                  :label="dict.label"
+                  :value="parseInt(dict.value)"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="计划完工" prop="orderDeadline" >
+              <el-date-picker clearable
+                v-model="form.orderDeadline"
+                type="date"
+                value-format="yyyy-MM-dd"
+                style="width:100%;"
+                :disabled="true"
+                placeholder="请选择计划完工日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="开始生产" prop="orderStartDate" >
+              <el-date-picker clearable
+                v-model="form.orderStartDate"
+                type="date"
+                value-format="yyyy-MM-dd"
+                style="width:100%;"
+                :disabled="true"
+                placeholder="暂未开始生产">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="实际完工" prop="orderEndDate" >
+              <el-date-picker clearable
+                v-model="form.orderEndDate"
+                type="date"
+                value-format="yyyy-MM-dd"
+                style="width:100%;"
+                :disabled="true"
+                placeholder="暂未完工">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="工序名称" prop="processName" >
+              <!-- <span>{{ reportInfoList.processId }}</span> -->
+              <el-select v-model="reportInfoList.processId" placeholder="工序" clearable :disabled="true">
+                <el-option
+                  v-for="item in processList"
+                  :key="item.processId"
+                  :label="item.processName"
+                  :value="item.processId"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="工序顺序" prop="processName" >
+              <span>第{{ reportInfoList.processIndex + 1 }}道工序</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+
+      <el-divider content-position="center">请在确认上方信息后，填写下方报工单</el-divider>
+      <el-form ref="reportForm" :model="reportForm" :rules="reportRules" label-width="80px">
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="报工人" prop="userId">
+              <el-select v-model="reportForm.userId" placeholder="请选择用户" clearable>
+                <el-option
+                  v-for="item in userList"
+                  :key="item.userId"
+                  :label="item.nickName"
+                  :value="item.userId"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="报工时间" prop="reportTime">
+              <el-date-picker clearable
+                v-model="reportForm.reportTime"
+                type="date"
+                value-format="yyyy-MM-dd"
+                style="width:100%;"
+                placeholder="请选择报工时间">
+              </el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="报工数量" prop="reportNumber">
+              <el-input v-model="reportForm.reportNumber" placeholder="请输入报工数量" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitReportForm">确 定</el-button>
+        <el-button @click="reportFormCancel">返回</el-button>
+      </div>
+    </el-dialog>
+    <!-- ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ 报工填报层 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑ -->
 
     <!-- ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 物料查询弹出层 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ -->
     <el-dialog :title="materialTitle" :visible.sync="materialOpen" width="950px" append-to-body>
@@ -535,9 +879,12 @@ import { listRoute, getRoute } from "@/api/mes/route";
 import { listStation } from "@/api/mes/station";
 import { listWorkshop } from "@/api/mes/workshop";
 import { listProcess, getProcess } from "@/api/mes/process";
+import { listUser } from "@/api/system/user";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { listOrder, getOrder, delOrder, addOrder, updateOrder, changeOrderStatus } from "@/api/mes/order";
+import { addReport } from "@/api/mes/report";
+
 
 export default {
   name: "Order",
@@ -581,6 +928,10 @@ export default {
       // 工序路线数据
       routeList: [],
       // ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑查询物料产品弹窗所用数据↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+      // 用户列表
+      userList: [],
+      // 工序填报表头数据
+      reportInfoList: [],
 
       // 当前用户名
       username: null,
@@ -611,10 +962,20 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示报工弹出层
+      reportOpen: false,
+      // 是否显示报工填报层
+      reportDetailopen: false,
+      // 报工弹出层所用Id暂存
+      reportOrderId: null,
       // 是否显示物料查询弹出层
       materialOpen: false,
       // 物料查询弹出层标题
       materialTitle: "",
+      // 报工弹出层标题
+      reportTitle: "报工工序选择",
+      // 报工填报层标题
+      reportDetailTitle: "报工信息填写",
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -631,6 +992,10 @@ export default {
       },
       // 表单参数
       form: {},
+      // 报工单表单
+      reportForm: {
+        reportTime: new Date(),
+      },
       // 表单校验
       rules: {
         orderId: [
@@ -662,9 +1027,16 @@ export default {
     this.materialgetList();
     this.getTreeselect();
     this.getRouteList();
+    this.getUserList();
     this.username = this.$store.state.user.name;
   },
   methods: {
+    /** 获取用户列表 */
+    getUserList() {
+      listUser({}).then(response => {
+        this.userList = response.rows;
+      });
+    },
     /** 获取工序列表 */
     getProcessList() {
       listProcess({}).then(response => {
@@ -770,6 +1142,36 @@ export default {
       });
     },
     // 取消按钮
+    reportCancel() {
+      this.reportOpen = false;
+      this.reset();
+    },
+    // 报工填报提交按钮
+    submitReportForm(){
+      this.$refs["reportForm"].validate(valid => {
+        if (valid) {
+          this.reportForm.orderId = this.reportOrderId;
+          this.reportForm.routeId = this.reportInfoList.routeId;
+          this.reportForm.processId = this.reportInfoList.processId;
+          this.reportForm.stationId = this.reportInfoList.stationId;
+          this.reportForm.workshopId = this.reportInfoList.workshopId;
+          addReport(this.reportForm).then(response => {
+            this.$modal.msgSuccess("新增成功");
+            this.reportDetailopen = false;
+            getOrder(reportOrderId).then(response => {
+              this.orderRouteList = response.data.orderRouteList;
+            });
+          });
+        }
+      });
+    },
+    // 报工填报取消按钮
+    reportFormCancel() {
+      this.reportDetailopen = false;
+      this.reportForm = {};
+      this.reportForm.reportTime = new Date();
+    },
+    // 取消按钮
     cancel() {
       this.open = false;
       this.reset();
@@ -777,6 +1179,7 @@ export default {
     // 表单重置
     reset() {
       this.form = {
+        unfold: false,
         orderId: null,
         orderBatchId: null,
         orderCreator: null,
@@ -807,6 +1210,28 @@ export default {
       this.ids = selection.map(item => item.orderId)
       this.single = selection.length!==1
       this.multiple = !selection.length
+    },
+    /** 报工按钮操作 */
+    handleReport(row) {
+      this.reset();
+      const orderId = row.orderId || this.ids
+      this.reportOrderId = orderId;
+      getOrder(orderId).then(response => {
+        this.form = response.data;
+        this.reportOpen = true;
+        this.orderRouteList = response.data.orderRouteList;
+        getItem(response.data.orderMaterialId).then(response => {
+          this.form.orderMaterialName = response.data.materialItemName;
+          this.form.orderMaterialId = response.data.materialItemId;
+          this.form.orderMaterialModel = response.data.materialItemModel;
+          this.form.orderMaterialUnit = response.data.materialItemUnit;
+        });
+      });
+    },
+    /** 报工填报按钮操作 */
+    handleReportOrderRoute(row) {
+      this.reportDetailopen = true;
+      this.reportInfoList = row;
     },
     /** 新增按钮操作 */
     handleAdd() {
