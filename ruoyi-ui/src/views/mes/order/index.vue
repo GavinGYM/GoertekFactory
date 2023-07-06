@@ -1206,20 +1206,25 @@ export default {
     },
     /** 报工按钮操作 */
     handleReport(row) {
-      this.reset();
-      const orderId = row.orderId || this.ids
-      this.reportOrderId = orderId;
-      getOrder(orderId).then(response => {
-        this.form = response.data;
-        this.reportOpen = true;
-        this.orderRouteList = response.data.orderRouteList;
-        getItem(response.data.orderMaterialId).then(response => {
-          this.form.orderMaterialName = response.data.materialItemName;
-          this.form.orderMaterialId = response.data.materialItemId;
-          this.form.orderMaterialModel = response.data.materialItemModel;
-          this.form.orderMaterialUnit = response.data.materialItemUnit;
+      if (row.orderStatus == 1) {
+        this.reset();
+        const orderId = row.orderId || this.ids
+        this.reportOrderId = orderId;
+        getOrder(orderId).then(response => {
+          this.form = response.data;
+          this.reportOpen = true;
+          this.orderRouteList = response.data.orderRouteList;
+          getItem(response.data.orderMaterialId).then(response => {
+            this.form.orderMaterialName = response.data.materialItemName;
+            this.form.orderMaterialId = response.data.materialItemId;
+            this.form.orderMaterialModel = response.data.materialItemModel;
+            this.form.orderMaterialUnit = response.data.materialItemUnit;
+          });
         });
-      });
+      } else {
+        this.$modal.msgError("工单编号为" + row.orderId + "的工单不在生产状态，不能报工");
+      }
+      
     },
     /** 报工填报按钮操作 */
     handleReportOrderRoute(row) {
