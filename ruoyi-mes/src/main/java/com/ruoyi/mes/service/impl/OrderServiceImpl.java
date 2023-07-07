@@ -177,6 +177,9 @@ public class OrderServiceImpl implements IOrderService
             List<OrderRoute> list = new ArrayList<OrderRoute>();
             for (OrderRoute orderRoute : orderRouteList)
             {
+                if(orderRoute.getOrderFinishNumber() == null){
+                    orderRoute.setOrderFinishNumber(0L);
+                }
                 orderRoute.setOrderId(orderId);
                 list.add(orderRoute);
             }
