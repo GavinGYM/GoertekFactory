@@ -188,7 +188,6 @@
         <module>ruoyi-generator</module>
         <module>ruoyi-common</module>
         <module>ruoyi-mes</module>
-        <module>ruoyi-mes</module>
     </modules>
     <packaging>pom</packaging>
 
