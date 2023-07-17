@@ -1,99 +1,87 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="false" v-show="showSearch" label-width="68px">
-      <el-row>
-        <el-col :span="5">
-          <el-form-item label="工单号" prop="orderId">
-            <el-input
-              v-model="queryParams.orderId"
-              placeholder="请输入工单号"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="5">
-          <el-form-item label="批次号" prop="orderBatchId">
-            <el-input
-              v-model="queryParams.orderBatchId"
-              placeholder="请输入批次号"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-        </el-col>
-          <!-- <el-form-item label="创建人" prop="orderCreator">
-          <el-input
-            v-model="queryParams.orderCreator"
-            placeholder="请输入创建人"
-            clearable
-            @keyup.enter.native="handleQuery"
+    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="工单号" prop="orderId">
+        <el-input
+          v-model="queryParams.orderId"
+          placeholder="请输入工单号"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="批次号" prop="orderBatchId">
+        <el-input
+          v-model="queryParams.orderBatchId"
+          placeholder="请输入批次号"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <!-- <el-form-item label="创建人" prop="orderCreator">
+      <el-input
+        v-model="queryParams.orderCreator"
+        placeholder="请输入创建人"
+        clearable
+        @keyup.enter.native="handleQuery"
+      />
+    </el-form-item> -->
+      <el-form-item label="状态" prop="orderStatus">
+        <el-select v-model="queryParams.orderStatus" placeholder="请选择状态" clearable>
+          <el-option
+            v-for="dict in dict.type.mes_order_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
           />
-        </el-form-item> -->
-        <el-col :span="4">
-          <el-form-item label="状态" prop="orderStatus">
-            <el-select v-model="queryParams.orderStatus" placeholder="请选择状态" clearable>
-              <el-option
-                v-for="dict in dict.type.mes_order_status"
-                :key="dict.value"
-                :label="dict.label"
-                :value="dict.value"
-              />
-            </el-select>
-          </el-form-item>
-        </el-col>
-        <el-col :span="5">
-          <el-form-item label="物料" prop="orderMaterialId">
-            <el-input
-              v-model="queryParams.orderMaterialId"
-              placeholder="请输入物料"
-              clearable
-              @keyup.enter.native="handleQuery"
-            />
-          </el-form-item>
-        </el-col>
-          <!-- <el-form-item label="计划完工日期" prop="orderDeadline">
-          <el-date-picker clearable
-            v-model="queryParams.orderDeadline"
-            type="date"
-            value-format="yyyy-MM-dd"
-            style="width:100%;"
-            placeholder="请选择计划完工日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="开始生产日期" prop="orderStartDate">
-          <el-date-picker clearable
-            v-model="queryParams.orderStartDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            style="width:100%;"
-            placeholder="请选择开始生产日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="实际完工日期" prop="orderEndDate">
-          <el-date-picker clearable
-            v-model="queryParams.orderEndDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            style="width:100%;"
-            placeholder="请选择实际完工日期">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="生产数量" prop="orderNumber">
-          <el-input
-            v-model="queryParams.orderNumber"
-            placeholder="请输入生产数量"
-            clearable
-            @keyup.enter.native="handleQuery"
-          />
-        </el-form-item> -->
-        <el-col :span="5">
-          <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-            <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-          </el-form-item>
-        </el-col>
-      </el-row>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="物料" prop="orderMaterialId">
+        <el-input
+          v-model="queryParams.orderMaterialId"
+          placeholder="请输入物料"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <!-- <el-form-item label="计划完工日期" prop="orderDeadline">
+      <el-date-picker clearable
+        v-model="queryParams.orderDeadline"
+        type="date"
+        value-format="yyyy-MM-dd"
+        style="width:100%;"
+        placeholder="请选择计划完工日期">
+      </el-date-picker>
+    </el-form-item>
+    <el-form-item label="开始生产日期" prop="orderStartDate">
+      <el-date-picker clearable
+        v-model="queryParams.orderStartDate"
+        type="date"
+        value-format="yyyy-MM-dd"
+        style="width:100%;"
+        placeholder="请选择开始生产日期">
+      </el-date-picker>
+    </el-form-item>
+    <el-form-item label="实际完工日期" prop="orderEndDate">
+      <el-date-picker clearable
+        v-model="queryParams.orderEndDate"
+        type="date"
+        value-format="yyyy-MM-dd"
+        style="width:100%;"
+        placeholder="请选择实际完工日期">
+      </el-date-picker>
+    </el-form-item>
+    <el-form-item label="生产数量" prop="orderNumber">
+      <el-input
+        v-model="queryParams.orderNumber"
+        placeholder="请输入生产数量"
+        clearable
+        @keyup.enter.native="handleQuery"
+      />
+    </el-form-item> -->
+      <el-form-item>
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
+      </el-form-item>
     </el-form>
 
     <el-row :gutter="10" class="mb8">
